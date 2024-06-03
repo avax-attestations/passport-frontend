@@ -9,7 +9,7 @@ import { useAccount, useSignMessage } from "wagmi"
 import { Button } from "@/components/ui/button"
 import { jsonParseBigInt } from "@/lib/utils"
 
-import { PROXY_CONTRACT_ADDRESS } from "@/lib/config"
+import { PROXY_CONTRACT_ADDRESS, TWITTER_SCHEMA_UID, DIAMOND_HANDS_SCHEMA_UID } from "@/lib/config"
 
 import { isDiamondHands } from "@/lib/diamond-hands"
 import { useSigner } from "@/hooks/useSigner";
@@ -66,7 +66,10 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
   const diamondHands = isDiamondHands(session.user?.sub)
   const signer = useSigner()
   const [proxy, setProxy] = useState<EIP712Proxy | null>(null)
-  const isAttested = useIsAttested(session.user?.sub)
+  // TODO: This needs to be done for every attestion
+  // we support, right now it is just hardcoded to
+  // DiamondHand.
+  const isAttestedDiamondHand = useIsAttested(session.user?.sub)
 
   useEffect(() => {
     if (signer) {
@@ -76,9 +79,10 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
 
   const attestMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (variables) => {
       const res = await fetch('/api/attest', {
-        method: 'POST'
+        method: 'POST',
+        body: JSON.stringify({schemaId: variables.schemaId}),
       })
       const data = await res.json()
       const response = jsonParseBigInt(data.signedResponse)
@@ -112,6 +116,7 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
     buttonLabel: 'Connect'
   }, {
     name: 'twitter',
+    schemaId: TWITTER_SCHEMA_UID,
     linked: twitterLinked,
     connectUrl: '/api/auth/signin/twitter',
     description: 'Link Twitter/X account',
@@ -157,9 +162,9 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
           <Image src={`/diamond.png`} alt={`Is diamond hands`} width={75} height={75} />
           {diamondHands ? (
             <><p>You have diamond hands!</p>
-              {isAttested ? <p>Already attested</p> :
+              {isAttestedDiamondHand ? <p>Already attested</p> :
               <Button type="button" onClick={() => {
-                attestMutation.mutate()
+                attestMutation.mutate({schemaId: DIAMOND_HANDS_SCHEMA_UID})
               }}>Attest</Button>}</>
           ) : (
             <p>You do not have diamond hands</p>)}

@@ -9,7 +9,9 @@ import {
   PROXY_CONTRACT_ADDRESS,
   PRIVATE_KEY,
   DIAMOND_HANDS_SCHEMA_UID,
-  DIAMOND_HANDS_ATTESTATION_DATA
+  DIAMOND_HANDS_ATTESTATION_DATA,
+  TWITTER_SCHEMA_UID,
+  twitterEncoder
 } from "@/lib/config"
 
 
@@ -34,8 +36,51 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No wallet address found in session' }, { status: 400 })
   }
 
-  if (!isDiamondHands(walletAddress)) {
-    return NextResponse.json({ error: 'User is not diamond hands' }, { status: 400 })
+  const payload = await req.json()
+  let params;
+  switch(payload.schemaId) {
+
+    case DIAMOND_HANDS_SCHEMA_UID: {
+
+      if (!isDiamondHands(walletAddress)) {
+        return NextResponse.json({ error: 'User is not diamond hands' }, { status: 400 })
+      }
+
+      params = {
+        schema: DIAMOND_HANDS_SCHEMA_UID,
+        recipient: walletAddress,
+        expirationTime: 0n,
+        revocable: false,
+        refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        data: DIAMOND_HANDS_ATTESTATION_DATA,
+        value: 0n,
+        deadline: 0n
+      };
+      break;
+
+    }
+    case TWITTER_SCHEMA_UID: {
+       // TODO Make sure they have a twitter ID in the JWT.
+       params = {
+        schema: TWITTER_SCHEMA_UID,
+        recipient: walletAddress,
+        expirationTime: 0n,
+        revocable: false,
+        refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        data: twitterEncoder.encodeData([{
+          name: 'twitterId',
+          type: 'uint256',
+          value: 0//TODO: session.user.twitter
+        }]),
+        value: 0n,
+        deadline: 0n
+       }
+       break;
+    }
+    default: {
+      return NextResponse.json({ error: 'Invalid schema' }, { status: 400 })
+
+    }
   }
 
   const provider = new JsonRpcProvider('https://avalanche-fuji-c-chain-rpc.publicnode.com/')
@@ -45,23 +90,11 @@ export async function POST(req: NextRequest) {
 
   const delegated = await proxy.getDelegated()
 
-  const params = {
-    schema: DIAMOND_HANDS_SCHEMA_UID,
-    recipient: walletAddress,
-    expirationTime: 0n,
-    revocable: false,
-    refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    data: DIAMOND_HANDS_ATTESTATION_DATA,
-    value: 0n,
-    deadline: 0n
-  };
-
   const response = await delegated.signDelegatedProxyAttestation(params, signer);
   const signedResponse = jsonStringifyBigInt({
     message: response.message,
     signature: response.signature,
   })
-
 
   return NextResponse.json({ signedResponse })
 }
