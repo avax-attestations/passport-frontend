@@ -60,7 +60,21 @@ interface SignedInProps {
   signOut: Auth['signOut']
 }
 
-function SocialAttestationProvider({}) { }
+function SocialAttestationProvider({name, linked, connectedDescription, description, connectUrl, csrfToken, buttonLabel}) {
+  return (
+    <div key={name} className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
+      <Image src={`/${name}.png`} alt={`${name} connection`} width={75} height={75} />
+      {linked ? (
+        <p>{connectedDescription}</p>) : (<>
+          <p>{description}</p>
+          <form action={connectUrl} method="post">
+            <input type="hidden" name="csrfToken" value={csrfToken} />
+            <input type="hidden" name="callbackUrl" value={window.location.origin} />
+            <Button type="submit">{buttonLabel}</Button>
+          </form></>)}
+    </div>
+  )
+}
 
 
 function DiamondHandAttestationProvider({ session, attestMutation }) {
@@ -163,17 +177,14 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
       <div className="flex flex-wrap mt-10">
 
         {socialConnections.map(({ name, linked, connectUrl, description, connectedDescription, buttonLabel }) => (
-          <div key={name} className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
-            <Image src={`/${name}.png`} alt={`${name} connection`} width={75} height={75} />
-            {linked ? (
-              <p>{connectedDescription}</p>) : (<>
-                <p>{description}</p>
-                <form action={connectUrl} method="post">
-                  <input type="hidden" name="csrfToken" value={csrfToken} />
-                  <input type="hidden" name="callbackUrl" value={window.location.origin} />
-                  <Button type="submit">{buttonLabel}</Button>
-                </form></>)}
-          </div>
+          <SocialAttestationProvider
+            name={name}
+            linked={linked}
+            connectUrl={connectUrl}
+            description={description}
+            connectedDescription={connectedDescription}
+            buttonLabel={buttonLabel}
+          />
         ))}
         <DiamondHandAttestationProvider session={session} attestMutation={attestMutation} />
       </div>
