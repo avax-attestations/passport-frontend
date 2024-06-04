@@ -11,7 +11,9 @@ import {
   DIAMOND_HANDS_SCHEMA_UID,
   DIAMOND_HANDS_ATTESTATION_DATA,
   TWITTER_SCHEMA_UID,
-  twitterEncoder
+  GITHUB_SCHEMA_UID,
+  twitterEncoder,
+  githubEncoder
 } from "@/lib/config"
 
 
@@ -30,7 +32,8 @@ function getWalletAddress(session: any) {
 }
 
 export async function POST(req: NextRequest) {
-  const walletAddress = getWalletAddress(await auth())
+  const session = await auth()
+  const walletAddress = getWalletAddress(session)
 
   if (!walletAddress) {
     return NextResponse.json({ error: 'No wallet address found in session' }, { status: 400 })
@@ -70,20 +73,39 @@ export async function POST(req: NextRequest) {
         data: twitterEncoder.encodeData([{
           name: 'twitterId',
           type: 'uint256',
-          value: 0//TODO: session.user.twitter
+          value: session.user?.linkedAccounts?.['twitter']
         }]),
         value: 0n,
         deadline: 0n
        }
        break;
     }
+    case GITHUB_SCHEMA_UID: {
+       // TODO Make sure they have a twitter ID in the JWT.
+       params = {
+        schema: GITHUB_SCHEMA_UID,
+        recipient: walletAddress,
+        expirationTime: 0n,
+        revocable: false,
+        refUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        data: githubEncoder.encodeData([{
+          name: 'githubId',
+          type: 'string',
+          value: session.user?.linkedAccounts?.['github']
+        }]),
+        value: 0n,
+        deadline: 0n
+       }
+       break;
+    }
+
     default: {
       return NextResponse.json({ error: 'Invalid schema' }, { status: 400 })
 
     }
   }
 
-  const provider = new JsonRpcProvider('https://avalanche-fuji-c-chain-rpc.publicnode.com/')
+  const provider = new JsonRpcProvider('http://localhost:8545/')  // TODO: env variable
   const signer = new Wallet(PRIVATE_KEY, provider);
 
   const proxy = new EIP712Proxy(PROXY_CONTRACT_ADDRESS, { signer: signer })

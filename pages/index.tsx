@@ -9,7 +9,7 @@ import { useAccount, useSignMessage } from "wagmi"
 import { Button } from "@/components/ui/button"
 import { jsonParseBigInt } from "@/lib/utils"
 
-import { PROXY_CONTRACT_ADDRESS, TWITTER_SCHEMA_UID, DIAMOND_HANDS_SCHEMA_UID } from "@/lib/config"
+import { PROXY_CONTRACT_ADDRESS, TWITTER_SCHEMA_UID, GITHUB_SCHEMA_UID, DIAMOND_HANDS_SCHEMA_UID } from "@/lib/config"
 
 import { isDiamondHands } from "@/lib/diamond-hands"
 import { useSigner } from "@/hooks/useSigner";
@@ -148,7 +148,7 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
   const socialConnections = [{
     name: 'github',
-    schema: null,
+    schema: GITHUB_SCHEMA_UID,
     linked: githubLinked,
     connectUrl: '/api/auth/signin/github',
     description: 'Link Github account',
