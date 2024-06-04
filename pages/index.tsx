@@ -60,18 +60,23 @@ interface SignedInProps {
   signOut: Auth['signOut']
 }
 
-function SocialAttestationProvider({name, linked, connectedDescription, description, connectUrl, csrfToken, buttonLabel}) {
+function SocialAttestationProvider({name, schema, linked, connectedDescription, description, connectUrl, csrfToken, buttonLabel, session, attestMutation}) {
   return (
     <div key={name} className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
       <Image src={`/${name}.png`} alt={`${name} connection`} width={75} height={75} />
-      {linked ? (
-        <p>{connectedDescription}</p>) : (<>
-          <p>{description}</p>
-          <form action={connectUrl} method="post">
-            <input type="hidden" name="csrfToken" value={csrfToken} />
-            <input type="hidden" name="callbackUrl" value={window.location.origin} />
-            <Button type="submit">{buttonLabel}</Button>
-          </form></>)}
+      {linked ? (<>
+        <p>{connectedDescription}</p>
+        <Button type="button" onClick={() => {
+            attestMutation.mutate({schemaId: schema})
+        }}>Attest</Button></>
+      ) : (<>
+        <p>{description}</p>
+        <form action={connectUrl} method="post">
+          <input type="hidden" name="csrfToken" value={csrfToken} />
+          <input type="hidden" name="callbackUrl" value={window.location.origin} />
+          <Button type="submit">{buttonLabel}</Button>
+        </form></>)
+      }
     </div>
   )
 }
@@ -143,7 +148,7 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
   const socialConnections = [{
     name: 'github',
-    schemaId: null,
+    schema: null,
     linked: githubLinked,
     connectUrl: '/api/auth/signin/github',
     description: 'Link Github account',
@@ -151,7 +156,7 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
     buttonLabel: 'Connect'
   }, {
     name: 'twitter',
-    schemaId: TWITTER_SCHEMA_UID,
+    schema: TWITTER_SCHEMA_UID,
     linked: twitterLinked,
     connectUrl: '/api/auth/signin/twitter',
     description: 'Link Twitter/X account',
@@ -176,14 +181,19 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
       <div className="flex flex-wrap mt-10">
 
-        {socialConnections.map(({ name, linked, connectUrl, description, connectedDescription, buttonLabel }) => (
+        {socialConnections.map(({ name, schema, linked, connectUrl, description, connectedDescription, buttonLabel }) => (
           <SocialAttestationProvider
+            key={name}
             name={name}
+            schema={schema}
             linked={linked}
             connectUrl={connectUrl}
             description={description}
             connectedDescription={connectedDescription}
             buttonLabel={buttonLabel}
+            session={session}
+            attestMutation={attestMutation}
+            csrfToken={csrfToken}
           />
         ))}
         <DiamondHandAttestationProvider session={session} attestMutation={attestMutation} />
