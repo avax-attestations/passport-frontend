@@ -42,12 +42,12 @@ const abi = [
   }
 ] as const
 
-async function check(client: PublicClient, address: Address) {
+async function check(client: PublicClient, schema: string, address: Address) {
   const attestationCount = await client.readContract({
     address: PROXY_CONTRACT_ADDRESS,
     abi: abi,
     functionName: 'userAuthenticationCount',
-    args: [address, DIAMOND_HANDS_SCHEMA_UID],
+    args: [address, schema],
   })
 
   if (!attestationCount) {
@@ -69,7 +69,7 @@ async function check(client: PublicClient, address: Address) {
   return true;
 }
 
-export function useIsAttested(address: Address) {
+export function useIsAttested(address: Address, schema: string) {
   const client = usePublicClient();
   const [isAttested, setIsAttested] = useState(false);
 
@@ -78,7 +78,7 @@ export function useIsAttested(address: Address) {
       return;
     }
 
-    const promise = check(client, address);
+    const promise = check(client, schema, address);
 
     promise.then((isAttested) => {
       setIsAttested(isAttested);

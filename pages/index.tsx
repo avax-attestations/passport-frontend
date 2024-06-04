@@ -60,15 +60,20 @@ interface SignedInProps {
   signOut: Auth['signOut']
 }
 
-function SocialAttestationProvider({name, schema, linked, connectedDescription, description, connectUrl, csrfToken, buttonLabel, session, attestMutation}) {
+function SocialAttestationProvider({name, schema, linked, description, connectUrl, csrfToken, buttonLabel, session, attestMutation}) {
+
+  const isAttested = useIsAttested(session.user?.sub, schema)
   return (
     <div key={name} className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
       <Image src={`/${name}.png`} alt={`${name} connection`} width={75} height={75} />
       {linked ? (<>
-        <p>{connectedDescription}</p>
-        <Button type="button" onClick={() => {
-            attestMutation.mutate({schemaId: schema})
-        }}>Attest</Button></>
+        <p>Connected as {linked}</p>
+          {isAttested ? <p>Already attested</p> :
+            <Button type="button" onClick={() => {
+              attestMutation.mutate({schemaId: schema})
+            }}>Attest</Button>
+          }
+        </>
       ) : (<>
         <p>{description}</p>
         <form action={connectUrl} method="post">
@@ -82,9 +87,9 @@ function SocialAttestationProvider({name, schema, linked, connectedDescription, 
 }
 
 
-function DiamondHandAttestationProvider({ session, attestMutation }) {
+function DiamondHandAttestationProvider({ session, attestMutation, schema }) {
   const diamondHands = isDiamondHands(session.user?.sub)
-  const isAttestedDiamondHand = useIsAttested(session.user?.sub)
+  const isAttestedDiamondHand = useIsAttested(session.user?.sub, schema)
 
   return (
     <div className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
@@ -93,7 +98,7 @@ function DiamondHandAttestationProvider({ session, attestMutation }) {
         <><p>You have diamond hands!</p>
           {isAttestedDiamondHand ? <p>Already attested</p> :
           <Button type="button" onClick={() => {
-            attestMutation.mutate({schemaId: DIAMOND_HANDS_SCHEMA_UID})
+            attestMutation.mutate({schemaId: schema})
           }}>Attest</Button>}</>
       ) : (
         <p>You do not have diamond hands</p>)}
@@ -102,13 +107,8 @@ function DiamondHandAttestationProvider({ session, attestMutation }) {
 }
 
 function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
-  const githubLinked = session.user?.linkedAccounts?.['github']
-  const twitterLinked = session.user?.linkedAccounts?.['twitter']
   const signer = useSigner()
   const [proxy, setProxy] = useState<EIP712Proxy | null>(null)
-  // TODO: This needs to be done for every attestion
-  // we support, right now it is just hardcoded to
-  // DiamondHand.
 
   useEffect(() => {
     if (signer) {
@@ -149,18 +149,16 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
   const socialConnections = [{
     name: 'github',
     schema: GITHUB_SCHEMA_UID,
-    linked: githubLinked,
+    linked: session.user?.linkedAccounts?.['github'],
     connectUrl: '/api/auth/signin/github',
     description: 'Link Github account',
-    connectedDescription: `Connected as "${githubLinked}"`,
     buttonLabel: 'Connect'
   }, {
     name: 'twitter',
     schema: TWITTER_SCHEMA_UID,
-    linked: twitterLinked,
+    linked: session.user?.linkedAccounts?.['twitter'],
     connectUrl: '/api/auth/signin/twitter',
     description: 'Link Twitter/X account',
-    connectedDescription: `Connected as "${twitterLinked}"`,
     buttonLabel: 'Connect'
   }]
 
@@ -181,7 +179,7 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
       <div className="flex flex-wrap mt-10">
 
-        {socialConnections.map(({ name, schema, linked, connectUrl, description, connectedDescription, buttonLabel }) => (
+        {socialConnections.map(({ name, schema, linked, connectUrl, description, buttonLabel }) => (
           <SocialAttestationProvider
             key={name}
             name={name}
@@ -189,14 +187,13 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
             linked={linked}
             connectUrl={connectUrl}
             description={description}
-            connectedDescription={connectedDescription}
             buttonLabel={buttonLabel}
             session={session}
             attestMutation={attestMutation}
             csrfToken={csrfToken}
           />
         ))}
-        <DiamondHandAttestationProvider session={session} attestMutation={attestMutation} />
+        <DiamondHandAttestationProvider schema={DIAMOND_HANDS_SCHEMA_UID} session={session} attestMutation={attestMutation} />
       </div>
     </div>
   )
