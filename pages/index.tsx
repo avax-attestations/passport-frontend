@@ -60,16 +60,36 @@ interface SignedInProps {
   signOut: Auth['signOut']
 }
 
+function SocialAttestationProvider({}) { }
+
+
+function DiamondHandAttestationProvider({ session, attestMutation }) {
+  const diamondHands = isDiamondHands(session.user?.sub)
+  const isAttestedDiamondHand = useIsAttested(session.user?.sub)
+
+  return (
+    <div className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
+      <Image src={`/diamond.png`} alt={`Is diamond hands`} width={75} height={75} />
+      {diamondHands ? (
+        <><p>You have diamond hands!</p>
+          {isAttestedDiamondHand ? <p>Already attested</p> :
+          <Button type="button" onClick={() => {
+            attestMutation.mutate({schemaId: DIAMOND_HANDS_SCHEMA_UID})
+          }}>Attest</Button>}</>
+      ) : (
+        <p>You do not have diamond hands</p>)}
+    </div>
+  )
+}
+
 function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
   const githubLinked = session.user?.linkedAccounts?.['github']
   const twitterLinked = session.user?.linkedAccounts?.['twitter']
-  const diamondHands = isDiamondHands(session.user?.sub)
   const signer = useSigner()
   const [proxy, setProxy] = useState<EIP712Proxy | null>(null)
   // TODO: This needs to be done for every attestion
   // we support, right now it is just hardcoded to
   // DiamondHand.
-  const isAttestedDiamondHand = useIsAttested(session.user?.sub)
 
   useEffect(() => {
     if (signer) {
@@ -109,6 +129,7 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
   const socialConnections = [{
     name: 'github',
+    schemaId: null,
     linked: githubLinked,
     connectUrl: '/api/auth/signin/github',
     description: 'Link Github account',
@@ -122,17 +143,13 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
     description: 'Link Twitter/X account',
     connectedDescription: `Connected as "${twitterLinked}"`,
     buttonLabel: 'Connect'
-  },]
+  }]
 
   let totalPoints = 0;
   for (const connection of socialConnections) {
     if (connection.linked) {
       totalPoints += 50;
     }
-  }
-
-  if (diamondHands) {
-    totalPoints += 150;
   }
 
   return (
@@ -158,21 +175,12 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
                 </form></>)}
           </div>
         ))}
-        <div className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
-          <Image src={`/diamond.png`} alt={`Is diamond hands`} width={75} height={75} />
-          {diamondHands ? (
-            <><p>You have diamond hands!</p>
-              {isAttestedDiamondHand ? <p>Already attested</p> :
-              <Button type="button" onClick={() => {
-                attestMutation.mutate({schemaId: DIAMOND_HANDS_SCHEMA_UID})
-              }}>Attest</Button>}</>
-          ) : (
-            <p>You do not have diamond hands</p>)}
-        </div>
+        <DiamondHandAttestationProvider session={session} attestMutation={attestMutation} />
       </div>
     </div>
   )
 }
+
 
 export default function Home() {
   const { signMessageAsync } = useSignMessage()
