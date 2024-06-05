@@ -42,7 +42,7 @@ const abi = [
   }
 ] as const
 
-async function check(client: PublicClient, schema: string, address: Address) {
+export async function check(client: PublicClient, schema: Address, address: Address) {
   const attestationCount = await client.readContract({
     address: PROXY_CONTRACT_ADDRESS,
     abi: abi,

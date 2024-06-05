@@ -60,26 +60,47 @@ interface SignedInProps {
   signOut: Auth['signOut']
 }
 
-function SocialAttestationProvider({name, schema, linked, description, connectUrl, csrfToken, buttonLabel, session, attestMutation}) {
+interface SocialConnection {
+  name: string,
+  schema: string,
+  linked: string,
+  connectUrl: string,
+  description: string,
+  buttonLabel: string
+}
 
-  const isAttested = useIsAttested(session.user?.sub, schema)
+interface socialAttestationProps {
+  social: SocialConnection,
+  csrfToken: string,
+  session: NonNullable<Auth['session']>,
+  attestMutation: any
+}
+
+function SocialAttestationProvider({
+  social,
+  csrfToken,
+  session,
+  attestMutation
+}: socialAttestationProps) {
+
+  const isAttested = useIsAttested(session.user?.sub, social.schema)
   return (
-    <div key={name} className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
-      <Image src={`/${name}.png`} alt={`${name} connection`} width={75} height={75} />
-      {linked ? (<>
-        <p>Connected as {linked}</p>
+    <div key={social.name} className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
+      <Image src={`/${social.name}.png`} alt={`${social.name} connection`} width={75} height={75} />
+      {social.linked ? (<>
+        <p>Connected as {social.linked}</p>
           {isAttested ? <p>Already attested</p> :
             <Button type="button" onClick={() => {
-              attestMutation.mutate({schemaId: schema})
+              attestMutation.mutate({schemaId: social.schema})
             }}>Attest</Button>
           }
         </>
       ) : (<>
-        <p>{description}</p>
-        <form action={connectUrl} method="post">
+        <p>{social.description}</p>
+        <form action={social.connectUrl} method="post">
           <input type="hidden" name="csrfToken" value={csrfToken} />
           <input type="hidden" name="callbackUrl" value={window.location.origin} />
-          <Button type="submit">{buttonLabel}</Button>
+          <Button type="submit">{social.buttonLabel}</Button>
         </form></>)
       }
     </div>
@@ -124,6 +145,7 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
         body: JSON.stringify({schemaId: variables.schemaId}),
       })
       const data = await res.json()
+	  console.log('got data', data)
       const response = jsonParseBigInt(data.signedResponse)
       if (!proxy) {
         // TODO use toast or something similar to report an error, though I think we should never reach this point
@@ -141,7 +163,6 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
         attester: response.message.attester,
         signature: response.signature,
       })
-
       await tx.wait();
     }
   })
@@ -179,15 +200,10 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
       <div className="flex flex-wrap mt-10">
 
-        {socialConnections.map(({ name, schema, linked, connectUrl, description, buttonLabel }) => (
+        {socialConnections.map((social) => (
           <SocialAttestationProvider
-            key={name}
-            name={name}
-            schema={schema}
-            linked={linked}
-            connectUrl={connectUrl}
-            description={description}
-            buttonLabel={buttonLabel}
+            key={social.name}
+			social={social}
             session={session}
             attestMutation={attestMutation}
             csrfToken={csrfToken}
