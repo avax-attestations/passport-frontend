@@ -6,6 +6,7 @@ import { isDiamondHands } from "@/lib/diamond-hands"
 import { jsonStringifyBigInt } from "@/lib/utils"
 
 import {
+  RPC_PROVIDER,
   PROXY_CONTRACT_ADDRESS,
   PRIVATE_KEY,
   DIAMOND_HANDS_SCHEMA_UID,
@@ -64,6 +65,7 @@ export async function POST(req: NextRequest) {
     }
     case TWITTER_SCHEMA_UID: {
        // TODO Make sure they have a twitter ID in the JWT.
+
        params = {
         schema: TWITTER_SCHEMA_UID,
         recipient: walletAddress,
@@ -105,7 +107,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const provider = new JsonRpcProvider('http://localhost:8545/')  // TODO: env variable
+  const provider = new JsonRpcProvider(RPC_PROVIDER)
   const signer = new Wallet(PRIVATE_KEY, provider);
 
   const proxy = new EIP712Proxy(PROXY_CONTRACT_ADDRESS, { signer: signer })

@@ -69,7 +69,7 @@ export async function check(client: PublicClient, schema: Address, address: Addr
   return true;
 }
 
-export function useIsAttested(address: Address, schema: string) {
+export function useIsAttested(address: Address, schema: Address) {
   const client = usePublicClient();
   const [isAttested, setIsAttested] = useState(false);
 

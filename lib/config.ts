@@ -12,6 +12,7 @@ const devChains = ([
   hardhat,
 ] as ViemChain[]).concat(supportedChains) as [ViemChain, ...ViemChain[]]
 
+export const RPC_PROVIDER = process.env.RPC_PROVIDER
 export const chains = process.env.NODE_ENV === 'production' ? prodChains : devChains
 export const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
