@@ -54,22 +54,16 @@ function SignedOut({ csrfToken, signIn, address, chain, signMessageAsync }: Sign
   )
 }
 
-interface SignedInProps {
-  session: NonNullable<Auth['session']>
-  csrfToken: Auth['csrfToken']
-  signOut: Auth['signOut']
-}
-
 interface SocialConnection {
   name: string,
-  schema: string,
+  schema: Address,
   linked: string,
   connectUrl: string,
   description: string,
   buttonLabel: string
 }
 
-interface socialAttestationProps {
+interface SocialAttestationProps {
   social: SocialConnection,
   csrfToken: string,
   session: NonNullable<Auth['session']>,
@@ -81,7 +75,7 @@ function SocialAttestationProvider({
   csrfToken,
   session,
   attestMutation
-}: socialAttestationProps) {
+}: SocialAttestationProps) {
 
   const isAttested = useIsAttested(session.user?.sub, social.schema)
   return (
@@ -108,7 +102,13 @@ function SocialAttestationProvider({
 }
 
 
-function DiamondHandAttestationProvider({ session, attestMutation, schema }) {
+interface DiamondHandAttestationProps{
+  session: NonNullable<Auth['session']>,
+  attestMutation: any,
+  schema: Address
+}
+
+function DiamondHandAttestationProvider({ session, attestMutation, schema }: DiamondHandAttestationProps) {
   const diamondHands = isDiamondHands(session.user?.sub)
   const isAttestedDiamondHand = useIsAttested(session.user?.sub, schema)
 
@@ -127,6 +127,16 @@ function DiamondHandAttestationProvider({ session, attestMutation, schema }) {
   )
 }
 
+interface SignedInProps {
+  session: NonNullable<Auth['session']>
+  csrfToken: Auth['csrfToken']
+  signOut: Auth['signOut']
+}
+
+interface AttestMutationVariables {
+  schemaId: string
+}
+
 function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
   const signer = useSigner()
   const [proxy, setProxy] = useState<EIP712Proxy | null>(null)
@@ -139,13 +149,12 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
 
   const attestMutation = useMutation({
-    mutationFn: async (variables) => {
+    mutationFn: async (variables: AttestMutationVariables) => {
       const res = await fetch('/api/attest', {
         method: 'POST',
         body: JSON.stringify({schemaId: variables.schemaId}),
       })
       const data = await res.json()
-	  console.log('got data', data)
       const response = jsonParseBigInt(data.signedResponse)
       if (!proxy) {
         // TODO use toast or something similar to report an error, though I think we should never reach this point
@@ -203,7 +212,7 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
         {socialConnections.map((social) => (
           <SocialAttestationProvider
             key={social.name}
-			social={social}
+            social={social}
             session={session}
             attestMutation={attestMutation}
             csrfToken={csrfToken}
