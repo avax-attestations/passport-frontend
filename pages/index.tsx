@@ -63,18 +63,21 @@ interface SocialConnection {
   buttonLabel: string
 }
 
-interface SocialAttestationProps {
+interface AttestationProviderProps {
+    attest: (schemaId: Address) => void;
+}
+
+interface SocialAttestationProps extends AttestationProviderProps {
   social: SocialConnection,
   csrfToken: string,
   session: NonNullable<Auth['session']>,
-  attestMutation: any
 }
 
 function SocialAttestationProvider({
+  attest,
   social,
   csrfToken,
   session,
-  attestMutation
 }: SocialAttestationProps) {
 
   const isAttested = useIsAttested(session.user?.sub, social.schema)
@@ -84,9 +87,7 @@ function SocialAttestationProvider({
       {social.linked ? (<>
         <p>Connected as {social.linked}</p>
           {isAttested ? <p>Already attested</p> :
-            <Button type="button" onClick={() => {
-              attestMutation.mutate({schemaId: social.schema})
-            }}>Attest</Button>
+            <Button type="button" onClick={() => {attest(social.schema)}}>Attest</Button>
           }
         </>
       ) : (<>
@@ -102,13 +103,12 @@ function SocialAttestationProvider({
 }
 
 
-interface DiamondHandAttestationProps{
+interface DiamondHandAttestationProps extends AttestationProviderProps {
   session: NonNullable<Auth['session']>,
-  attestMutation: any,
   schema: Address
 }
 
-function DiamondHandAttestationProvider({ session, attestMutation, schema }: DiamondHandAttestationProps) {
+function DiamondHandAttestationProvider({ session, schema, attest }: DiamondHandAttestationProps) {
   const diamondHands = isDiamondHands(session.user?.sub)
   const isAttestedDiamondHand = useIsAttested(session.user?.sub, schema)
 
@@ -118,9 +118,7 @@ function DiamondHandAttestationProvider({ session, attestMutation, schema }: Dia
       {diamondHands ? (
         <><p>You have diamond hands!</p>
           {isAttestedDiamondHand ? <p>Already attested</p> :
-          <Button type="button" onClick={() => {
-            attestMutation.mutate({schemaId: schema})
-          }}>Attest</Button>}</>
+          <Button type="button" onClick={() => {attest(schema)}}>Attest</Button>}</>
       ) : (
         <p>You do not have diamond hands</p>)}
     </div>
@@ -214,11 +212,15 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
             key={social.name}
             social={social}
             session={session}
-            attestMutation={attestMutation}
+            attest={(schemaId) => attestMutation.mutate({schemaId})}
             csrfToken={csrfToken}
           />
         ))}
-        <DiamondHandAttestationProvider schema={DIAMOND_HANDS_SCHEMA_UID} session={session} attestMutation={attestMutation} />
+        <DiamondHandAttestationProvider
+          schema={DIAMOND_HANDS_SCHEMA_UID}
+          session={session}
+          attest={(schemaId) => attestMutation.mutate({schemaId})}
+         />
       </div>
     </div>
   )
