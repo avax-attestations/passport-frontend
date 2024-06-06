@@ -9,7 +9,7 @@ import { useAccount, useSignMessage } from "wagmi"
 import { Button } from "@/components/ui/button"
 import { jsonParseBigInt } from "@/lib/utils"
 
-import { PROXY_CONTRACT_ADDRESS } from "@/lib/config"
+import { PROXY_CONTRACT_ADDRESS, TWITTER_SCHEMA_UID, GITHUB_SCHEMA_UID, DIAMOND_HANDS_SCHEMA_UID } from "@/lib/config"
 
 import { isDiamondHands } from "@/lib/diamond-hands"
 import { useSigner } from "@/hooks/useSigner";
@@ -54,19 +54,90 @@ function SignedOut({ csrfToken, signIn, address, chain, signMessageAsync }: Sign
   )
 }
 
+interface SocialConnection {
+  name: string,
+  schema: Address,
+  linked: string,
+  connectUrl: string,
+  description: string,
+  buttonLabel: string
+}
+
+interface AttestationProviderProps {
+    attest: (schemaId: Address) => void;
+}
+
+interface SocialAttestationProps extends AttestationProviderProps {
+  social: SocialConnection,
+  csrfToken: string,
+  session: NonNullable<Auth['session']>,
+}
+
+function SocialAttestationProvider({
+  attest,
+  social,
+  csrfToken,
+  session,
+}: SocialAttestationProps) {
+
+  const isAttested = useIsAttested(session.user?.sub, social.schema)
+  return (
+    <div key={social.name} className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
+      <Image src={`/${social.name}.png`} alt={`${social.name} connection`} width={75} height={75} />
+      {social.linked ? (<>
+        <p>Connected as {social.linked}</p>
+          {isAttested ? <p>Already attested</p> :
+            <Button type="button" onClick={() => {attest(social.schema)}}>Attest</Button>
+          }
+        </>
+      ) : (<>
+        <p>{social.description}</p>
+        <form action={social.connectUrl} method="post">
+          <input type="hidden" name="csrfToken" value={csrfToken} />
+          <input type="hidden" name="callbackUrl" value={window.location.origin} />
+          <Button type="submit">{social.buttonLabel}</Button>
+        </form></>)
+      }
+    </div>
+  )
+}
+
+
+interface DiamondHandAttestationProps extends AttestationProviderProps {
+  session: NonNullable<Auth['session']>,
+  schema: Address
+}
+
+function DiamondHandAttestationProvider({ session, schema, attest }: DiamondHandAttestationProps) {
+  const diamondHands = isDiamondHands(session.user?.sub)
+  const isAttestedDiamondHand = useIsAttested(session.user?.sub, schema)
+
+  return (
+    <div className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
+      <Image src={`/diamond.png`} alt={`Is diamond hands`} width={75} height={75} />
+      {diamondHands ? (
+        <><p>You have diamond hands!</p>
+          {isAttestedDiamondHand ? <p>Already attested</p> :
+          <Button type="button" onClick={() => {attest(schema)}}>Attest</Button>}</>
+      ) : (
+        <p>You do not have diamond hands</p>)}
+    </div>
+  )
+}
+
 interface SignedInProps {
   session: NonNullable<Auth['session']>
   csrfToken: Auth['csrfToken']
   signOut: Auth['signOut']
 }
 
+interface AttestMutationVariables {
+  schemaId: string
+}
+
 function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
-  const githubLinked = session.user?.linkedAccounts?.['github']
-  const twitterLinked = session.user?.linkedAccounts?.['twitter']
-  const diamondHands = isDiamondHands(session.user?.sub)
   const signer = useSigner()
   const [proxy, setProxy] = useState<EIP712Proxy | null>(null)
-  const isAttested = useIsAttested(session.user?.sub)
 
   useEffect(() => {
     if (signer) {
@@ -76,9 +147,10 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
 
   const attestMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (variables: AttestMutationVariables) => {
       const res = await fetch('/api/attest', {
-        method: 'POST'
+        method: 'POST',
+        body: JSON.stringify({schemaId: variables.schemaId}),
       })
       const data = await res.json()
       const response = jsonParseBigInt(data.signedResponse)
@@ -98,36 +170,31 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
         attester: response.message.attester,
         signature: response.signature,
       })
-
       await tx.wait();
     }
   })
 
   const socialConnections = [{
     name: 'github',
-    linked: githubLinked,
+    schema: GITHUB_SCHEMA_UID,
+    linked: session.user?.linkedAccounts?.['github'],
     connectUrl: '/api/auth/signin/github',
     description: 'Link Github account',
-    connectedDescription: `Connected as "${githubLinked}"`,
     buttonLabel: 'Connect'
   }, {
     name: 'twitter',
-    linked: twitterLinked,
+    schema: TWITTER_SCHEMA_UID,
+    linked: session.user?.linkedAccounts?.['twitter'],
     connectUrl: '/api/auth/signin/twitter',
     description: 'Link Twitter/X account',
-    connectedDescription: `Connected as "${twitterLinked}"`,
     buttonLabel: 'Connect'
-  },]
+  }]
 
   let totalPoints = 0;
   for (const connection of socialConnections) {
     if (connection.linked) {
       totalPoints += 50;
     }
-  }
-
-  if (diamondHands) {
-    totalPoints += 150;
   }
 
   return (
@@ -140,34 +207,25 @@ function SignedIn({ session, signOut, csrfToken }: SignedInProps) {
 
       <div className="flex flex-wrap mt-10">
 
-        {socialConnections.map(({ name, linked, connectUrl, description, connectedDescription, buttonLabel }) => (
-          <div key={name} className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
-            <Image src={`/${name}.png`} alt={`${name} connection`} width={75} height={75} />
-            {linked ? (
-              <p>{connectedDescription}</p>) : (<>
-                <p>{description}</p>
-                <form action={connectUrl} method="post">
-                  <input type="hidden" name="csrfToken" value={csrfToken} />
-                  <input type="hidden" name="callbackUrl" value={window.location.origin} />
-                  <Button type="submit">{buttonLabel}</Button>
-                </form></>)}
-          </div>
+        {socialConnections.map((social) => (
+          <SocialAttestationProvider
+            key={social.name}
+            social={social}
+            session={session}
+            attest={(schemaId) => attestMutation.mutate({schemaId})}
+            csrfToken={csrfToken}
+          />
         ))}
-        <div className="mr-10 mt-10 flex flex-col items-center justify-between bg-gray-100 border rounded-sm p-5 w-[300px] h-[200px]">
-          <Image src={`/diamond.png`} alt={`Is diamond hands`} width={75} height={75} />
-          {diamondHands ? (
-            <><p>You have diamond hands!</p>
-              {isAttested ? <p>Already attested</p> :
-              <Button type="button" onClick={() => {
-                attestMutation.mutate()
-              }}>Attest</Button>}</>
-          ) : (
-            <p>You do not have diamond hands</p>)}
-        </div>
+        <DiamondHandAttestationProvider
+          schema={DIAMOND_HANDS_SCHEMA_UID}
+          session={session}
+          attest={(schemaId) => attestMutation.mutate({schemaId})}
+         />
       </div>
     </div>
   )
 }
+
 
 export default function Home() {
   const { signMessageAsync } = useSignMessage()
