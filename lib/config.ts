@@ -31,6 +31,10 @@ export const ATTESTATION_CONFIG = {
     'github': {
         schemaUID: '0x6723811a6182bcb2fde3035b69a8e3bb854f1ff76413b71d5673ed653208d7ac',
         encoder: new SchemaEncoder('string githubId'),
+    },
+    'volume': {
+        schemaUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        encoder: new SchemaEncoder('uint256 USDVolume'),
     }
 };
 
