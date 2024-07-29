@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import Image from 'next/image'
+import { ethers } from 'ethers';
 
 export type HeaderProps = {
   isConnected: boolean
@@ -25,8 +26,8 @@ export const Header: FC<HeaderProps> = ({
           <div className="col-span-1 flex flex-col justify-center">
             <span className="text-xs">My score:</span>
             <div className="flex flex-row" >
-              <span className="font-bold text-2xl">{score}</span>
-              <span>&nbsp;pts</span>
+              <span className="font-bold text-2xl">{ethers.formatEther(score)}</span>
+              <span>&nbsp;diamonds</span>
             </div>
           </div>
         </div>
