@@ -3,13 +3,13 @@ import { usePublicClient } from 'wagmi'
 
 import { DIAMOND_TOKEN_ADDRESS } from "@/lib/config"
 import { useEffect, useState } from 'react';
-import erc20ABI from '@/lib/erc20-abi.json';
+import { erc20Abi } from 'viem'
 
 
 async function check(client: PublicClient, address: Address) {
-  return await client.readContract({
+  return client.readContract({
     address: DIAMOND_TOKEN_ADDRESS,
-    abi: erc20ABI,
+    abi: erc20Abi,
     functionName: 'balanceOf',
     args: [address],
   })
