@@ -1,4 +1,4 @@
-[
+const proxyAbi = [
   {
     "type": "constructor",
     "inputs": [
@@ -1160,4 +1160,6 @@
     "name": "UsedSignature",
     "inputs": []
   }
-]
+] as const
+
+export default proxyAbi;
