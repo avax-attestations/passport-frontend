@@ -3,24 +3,20 @@ import { auth } from "@/lib/auth";
 import { isDiamondHands, attestedDiamondHands } from "@/lib/diamond-hands"
 import { signDiamondHand } from '@/lib/signing/diamond-hand';
 
-import {
-  PROXY_CONTRACT_ADDRESS,
-} from "@/lib/config"
-
-
-if (!PROXY_CONTRACT_ADDRESS) {
-  throw new Error('PROXY_CONTRACT_ADDRESS is not set')
-}
+import { getRedisInstance } from "@/lib/redis";
+import { Lock } from "@upstash/lock";
+import { ATTESTATION_DEADLINE } from "@/lib/config";
+import { getWalletAddress } from "@/lib/utils";
 
 export const runtime = "edge";
 
-function getWalletAddress(session: any) {
-  return session.user.sub
-}
-
 export async function POST(req: NextRequest) {
-  const walletAddress = getWalletAddress(await auth())
+  const session = await auth();
+  if (session === undefined || session === null) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 400 })
+  }
 
+  const walletAddress = getWalletAddress(session)
   if (!walletAddress) {
     return NextResponse.json({ error: 'No wallet address found in session' }, { status: 400 })
   }
@@ -33,6 +29,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'User has attestation' }, { status: 400 })
   }
 
-  const signedResponse = await signDiamondHand(walletAddress);
-  return NextResponse.json({ signedResponse })
+  const key = `${walletAddress}-diamond-hand`;
+  const redis = getRedisInstance();
+
+  const lock = new Lock({
+    id: `${key}-lock`,
+    lease: 5000,
+    redis: redis,
+  })
+
+  if (await lock.acquire()) {
+    try {
+      const current = await redis.get(key);
+      if (current) {
+        return NextResponse.json(current);
+      }
+      const signedResponse = await signDiamondHand(walletAddress);
+      await redis.set(key, {signedResponse}, {ex: ATTESTATION_DEADLINE});
+      return NextResponse.json({ signedResponse })
+    }
+    finally {
+      await lock.release()
+    }
+  } else {
+    return NextResponse.json({ error: 'Too Many Requests' }, { status: 429})
+  }
+
 }

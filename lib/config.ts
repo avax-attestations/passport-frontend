@@ -1,6 +1,14 @@
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import type { Address } from 'viem'
 import { Chain as ViemChain, avalanche, avalancheFuji, hardhat } from 'viem/chains';
+
+export const redisConf = {
+  url: process.env.REDIS_URL,
+  token: process.env.REDIS_TOKEN,
+}
+
+export const ATTESTATION_DEADLINE = 60 * 5;
+
 const supportedChains = [
   avalanche,
   avalancheFuji
@@ -17,6 +25,11 @@ export const chains = isProd ? prodChains : devChains
 export const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
 export const PROXY_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_PROXY_CONTRACT_ADDRESS! as Address;
+
+if (!PROXY_CONTRACT_ADDRESS) {
+  throw new Error('PROXY_CONTRACT_ADDRESS is not set')
+}
+
 export const PRIVATE_KEY = process.env.PRIVATE_KEY!;
 
 export const ATTESTATION_CONFIG = {
