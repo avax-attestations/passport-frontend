@@ -8,6 +8,7 @@ import { ConnectHeader } from "@/components/connect-header"
 import { isDiamondHands } from "@/lib/diamond-hands"
 import { useIsAttested } from "@/hooks/useIsAttested";
 import { useAttest } from "@/hooks/useAttest";
+import { useDiamondBalance } from "@/hooks/useDiamondBalance";
 
 interface SignedInProps {
   session: Auth['session']
@@ -53,16 +54,7 @@ function Main({ session, csrfToken }: SignedInProps) {
     attest: attestTwitter
   },]
 
-  let totalPoints = 0;
-  for (const connection of socialConnections) {
-    if (connection.linked) {
-      totalPoints += 50;
-    }
-  }
-
-  if (diamondHands) {
-    totalPoints += 150;
-  }
+  const totalPoints = useDiamondBalance(walletAddress);
 
   return (
     <>

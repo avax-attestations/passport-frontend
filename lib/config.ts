@@ -19,6 +19,8 @@ export const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PR
 export const PROXY_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_PROXY_CONTRACT_ADDRESS! as Address;
 export const PRIVATE_KEY = process.env.PRIVATE_KEY!;
 
+export const DIAMOND_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_DIAMOND_TOKEN_ADDRESS! as Address;
+
 export const ATTESTATION_CONFIG = {
     'diamond-hand': {
         schemaUID: '0xdb510b1ec6287bc9d4560ea47175ec0c3aabb083de43100f6308ad29dd1c1350',
