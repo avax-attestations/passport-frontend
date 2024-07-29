@@ -3,7 +3,7 @@ import { usePublicClient } from 'wagmi'
 
 import { PROXY_CONTRACT_ADDRESS } from "@/lib/config"
 import { useEffect, useState } from 'react';
-import proxyABI from '@/lib/proxy-abi.json';
+import proxyABI from '@/lib/proxy-abi';
 
 
 async function check(client: PublicClient, address: Address, attestationType: string) {
