@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 export type HeaderProps = {
   isConnected: boolean
   walletAddress: string
-  score: number
+  score: BigInt
   userName: string
 }
 
