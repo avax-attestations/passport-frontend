@@ -36,11 +36,11 @@ export const DIAMOND_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_DIAMOND_TOKEN_ADDRE
 
 export const ATTESTATION_CONFIG = {
     'diamond-hand': {
-        schemaUID: process.env.NEXT_PUBLIC_DIAMOND_HAND_SCHEMA,
+        schemaUID: process.env.NEXT_PUBLIC_DIAMOND_HAND_SCHEMA! as string,
         encoder: new SchemaEncoder('bool hasDiamondHand'),
     },
     'twitter': {
-       schemaUID: process.env.NEXT_PUBLIC_TWITTER_ID_SCHEMA,
+       schemaUID: process.env.NEXT_PUBLIC_TWITTER_ID_SCHEMA! as string,
        encoder: new SchemaEncoder('string twitterId'),
     },
     'github': {
