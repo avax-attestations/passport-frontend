@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import proxyABI from './proxy-abi.json';
+import proxyABI from './proxy-abi';
 
 
 export function getProxy(signerOrProvider: ethers.JsonRpcSigner | ethers.JsonRpcProvider) {
