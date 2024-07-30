@@ -9,19 +9,27 @@ export const redisConf = {
 
 export const ATTESTATION_DEADLINE = 60 * 5;
 
-const supportedChains = [
-  avalanche,
-  avalancheFuji
-] as ViemChain[]
+const prodChains = [avalanche] as ViemChain[]
 
-const prodChains = supportedChains as [ViemChain, ...ViemChain[]]
+const stagingChains = [avalancheFuji] as ViemChain[]
 
 const devChains = ([
   hardhat,
-] as ViemChain[]).concat(supportedChains) as [ViemChain, ...ViemChain[]]
+] as ViemChain[]).concat(prodChains).concat(stagingChains)
 
 export const isProd = process.env.NODE_ENV === 'production'
-export const chains = isProd ? prodChains : devChains
+export const chains = (() => {
+  if (!isProd) {
+    return devChains
+  }
+
+  if (process.env.PROD_CHAIN) {
+    return prodChains
+  }
+
+  return stagingChains
+})() as [ViemChain, ...ViemChain[]]
+
 export const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
 export const PROXY_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_PROXY_CONTRACT_ADDRESS! as Address;
