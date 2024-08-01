@@ -56,10 +56,12 @@ export const ATTESTATION_CONFIG = {
         encoder: new SchemaEncoder('string githubId'),
     },
     'volume': {
-        schemaUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
-        encoder: new SchemaEncoder('uint256 USDVolume'),
+        schemaUID: process.env.NEXT_PUBLIC_VOLUME_SCHEMA,
+        encoder: new SchemaEncoder('uint256 volume'),
     }
 };
+
+export const EAS_ADDRESS = process.env.NEXT_PUBLIC_EAS_ADDRESS! as Address;
 
 export const JSON_RPC_ENDPOINT = (() => {
   if (process.env.RPC_PROVIDER) {
