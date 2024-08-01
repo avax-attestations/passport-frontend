@@ -7,7 +7,7 @@ import { Lock } from "@upstash/lock";
 import { ATTESTATION_DEADLINE } from "@/lib/config";
 import { getWalletAddress } from "@/lib/utils";
 
-import { JsonRpcProvider } from 'ethers';
+import { ethers, Wallet, JsonRpcProvider } from 'ethers';
 import { getTotalVolume, getAttestedVolume } from "@/lib/volume";
 import { getProxy } from "@/lib/proxy";
 
@@ -26,8 +26,13 @@ export async function POST(req: NextRequest) {
   }
 
   const provider = new JsonRpcProvider(process.env.RPC_PROVIDER);
+  const signer = new Wallet(
+    '0x0000000000000000000000000000000000000000000000000000000000000001',
+    provider
+  );
+
   const totalVolume = await getTotalVolume(walletAddress);
-  const attestedVolume = await getAttestedVolume(walletAddress, provider, getProxy(provider));
+  const attestedVolume = await getAttestedVolume(walletAddress, signer, getProxy(provider));
   const volumeToAttest = totalVolume - attestedVolume;
 
   if (!volumeToAttest) {

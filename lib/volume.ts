@@ -22,7 +22,7 @@ export async function getTotalVolume(address: Address) {
 // volume.
 export async function getAttestedVolume(
   address: Address,
-  provider: Wallet | JsonRpcProvider | JsonRpcProvider | FallbackProvider,
+  provider: Wallet,
   proxy: ethers.Contract
 ) {
   const eas = new EAS(EAS_ADDRESS);

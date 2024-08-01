@@ -56,7 +56,7 @@ export const ATTESTATION_CONFIG = {
         encoder: new SchemaEncoder('string githubId'),
     },
     'volume': {
-        schemaUID: process.env.NEXT_PUBLIC_VOLUME_SCHEMA,
+        schemaUID: process.env.NEXT_PUBLIC_VOLUME_SCHEMA! as string,
         encoder: new SchemaEncoder('uint256 volume'),
     }
 };
