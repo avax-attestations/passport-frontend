@@ -9,6 +9,8 @@ import { isDiamondHands } from "@/lib/diamond-hands"
 import { useIsAttested } from "@/hooks/useIsAttested";
 import { useAttest } from "@/hooks/useAttest";
 import { useDiamondBalance } from "@/hooks/useDiamondBalance";
+import { useAttestedVolume } from "@/hooks/useAttestedVolume";
+import { useTotalVolume } from "@/hooks/useTotalVolume";
 
 interface SignedInProps {
   session: Auth['session']
@@ -34,6 +36,10 @@ function Main({ session, csrfToken }: SignedInProps) {
   const isAttestedTwitter = useIsAttested(walletAddress, 'twitter')
   const { attest: attestDiamondHands } = useAttest('diamond-hand')
   const { attest: attestTwitter } = useAttest('twitter')
+  const { attest: attestVolume} = useAttest('volume')
+
+  const volume = useTotalVolume(walletAddress);
+  const attestedVolume  = useAttestedVolume(walletAddress);
 
   const socialConnections = [{
     name: 'github',
@@ -69,6 +75,7 @@ function Main({ session, csrfToken }: SignedInProps) {
           {socialConnections.map((props) => (
             <AttestCardSocialConnection key={props.name} {...props} csrfToken={csrfToken} />
           ))}
+
           <AttestCard name="diamond">
             {diamondHands ? (
               <><p>You have diamond hands!</p>
@@ -77,6 +84,16 @@ function Main({ session, csrfToken }: SignedInProps) {
             ) : (
               <p>You do not have diamond hands</p>)}
           </AttestCard>
+
+          <AttestCard name="volume">
+            {volume ? (
+              <><p>You have Dex volume { volume } USD, attested { attestedVolume }!</p>
+                {attestedVolume == volume ? <p>No volume to attest</p> :
+                  <Button variant="passport" type="button" onClick={attestVolume}>Attest</Button>}</>
+            ) : (
+              <p>You do not have dex volume to attest</p>)}
+          </AttestCard>
+
         </div>)}
     </>
   )
