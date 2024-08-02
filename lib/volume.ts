@@ -1,8 +1,7 @@
 import type { Address } from 'viem'
-import { ethers } from 'ethers';
 import { EAS } from "@ethereum-attestation-service/eas-sdk";
 import { EAS_ADDRESS, ATTESTATION_CONFIG } from "@/lib/config";
-import { Wallet, FallbackProvider, JsonRpcProvider } from 'ethers';
+import { ethers, Wallet, JsonRpcSigner } from 'ethers';
 
 
 // Returns the total USD volume for a given address on the
@@ -13,7 +12,7 @@ import { Wallet, FallbackProvider, JsonRpcProvider } from 'ethers';
 // decimals however we want to round down to the lowest
 // dollar.
 export async function getTotalVolume(address: Address) {
-    return Math.floor(Date.now() / 1000);
+    return Math.floor(Date.now() / 10000000);
 }
 
 // Returns the sum of all volume attested to a given `address`.
@@ -22,7 +21,7 @@ export async function getTotalVolume(address: Address) {
 // volume.
 export async function getAttestedVolume(
   address: Address,
-  provider: Wallet,
+  provider: Wallet | JsonRpcSigner,
   proxy: ethers.Contract
 ) {
   const eas = new EAS(EAS_ADDRESS);
@@ -40,4 +39,3 @@ export async function getAttestedVolume(
   }
   return totalVolume;
 }
-

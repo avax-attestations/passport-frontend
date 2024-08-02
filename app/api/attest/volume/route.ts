@@ -4,10 +4,10 @@ import { signVolume } from '@/lib/signing/volume';
 
 import { getRedisInstance } from "@/lib/redis";
 import { Lock } from "@upstash/lock";
-import { ATTESTATION_DEADLINE } from "@/lib/config";
+import { ATTESTATION_DEADLINE, PRIVATE_KEY } from "@/lib/config";
 import { getWalletAddress } from "@/lib/utils";
 
-import { ethers, Wallet, JsonRpcProvider } from 'ethers';
+import { Wallet, JsonRpcProvider } from 'ethers';
 import { getTotalVolume, getAttestedVolume } from "@/lib/volume";
 import { getProxy } from "@/lib/proxy";
 
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
   const provider = new JsonRpcProvider(process.env.RPC_PROVIDER);
   const signer = new Wallet(
-    '0x0000000000000000000000000000000000000000000000000000000000000001',
+    PRIVATE_KEY,
     provider
   );
 
@@ -53,7 +53,6 @@ export async function POST(req: NextRequest) {
       if (current) {
         return NextResponse.json(current);
       }
-
       const signedResponse = await signVolume(walletAddress, volumeToAttest);
       await redis.set(key, {signedResponse}, {ex: ATTESTATION_DEADLINE});
       return NextResponse.json({ signedResponse })
