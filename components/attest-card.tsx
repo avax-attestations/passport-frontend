@@ -10,7 +10,7 @@ export const AttestCard: FC<AttestCardProps> = ({
   children
 }) => {
   return (
-    <div className="rounded-sm w-[300px] mt-5">
+    <div className="rounded-sm w-full pl-5 pr-5 sm:pl-0 sm:pr-0 sm:w-[205px] md:w-[245px] lg:w-[330px] mt-5">
       <div className="rounded-t-sm bg-[#191322] flex flex-col items-center w-full pb-10 pt-10">
         <Image src={`/card-logos/${name}.png`} alt={`${name} connection`} width={75} height={75} />
       </div>

@@ -70,7 +70,7 @@ function Main({ session, csrfToken }: SignedInProps) {
         walletAddress={walletAddress}
         score={totalPoints} />
       {walletAddress && (
-        <div className="flex flex-wrap justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between items-center">
 
           {socialConnections.map((props) => (
             <AttestCardSocialConnection key={props.name} {...props} csrfToken={csrfToken} />
@@ -104,7 +104,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col items-center justify-between pt-5">
-      <div className="w-[1024px]">
+      <div className="sm:w-[640px] md:w-[768px] lg:w-[1024px]">
         <ConnectHeader
           signedIn={!!session}
           csrfToken={csrfToken}

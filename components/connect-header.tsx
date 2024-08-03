@@ -116,7 +116,7 @@ export const ConnectHeader: FC<ConnectHeaderProps> = ({
   onSignOut
 }) => {
   return (
-    <div className="flex flex-row justify-between items-center mb-5">
+    <div className="flex flex-row justify-between items-center mb-12 sm:mb-5 pl-5 pr-5 sm:pl-0 sm:pr-0">
       <div className="flex flex-row">
         <Image src={`/logo.png`} alt={`Header`} width={50} height={50} />
         <div className="flex flex-col">
