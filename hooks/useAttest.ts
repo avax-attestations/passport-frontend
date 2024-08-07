@@ -1,21 +1,51 @@
 import { useMutation } from '@tanstack/react-query';
+import type { Address, PublicClient } from 'viem'
 import { jsonParseBigInt } from "@/lib/utils"
 import { ethers, Typed } from 'ethers';
+import { usePublicClient } from 'wagmi'
 import { useSigner } from "@/hooks/useSigner";
 import { getProxy } from '@/lib/proxy';
+import proxyABI from '@/lib/proxy-abi';
 
 import { useEffect, useState } from 'react';
 
+import { PROXY_CONTRACT_ADDRESS } from "@/lib/config"
 
-export function useAttest(kind: string) {
+async function check(client: PublicClient, address: Address, attestationType: string) {
+  const attestationCount = await client.readContract({
+    address: PROXY_CONTRACT_ADDRESS,
+    abi: proxyABI,
+    functionName: 'userAuthenticationCount',
+    args: [address, attestationType],
+  })
+  if (!attestationCount) {
+    return false;
+  }
+  return true;
+}
+
+export function useAttest(kind: string, address: Address) {
   const [proxy, setProxy] = useState<ethers.Contract| null>(null)
   const signer = useSigner()
+  const client = usePublicClient();
+  const [isAttested, setIsAttested] = useState(false);
 
   useEffect(() => {
     if (signer) {
       setProxy(getProxy(signer));
     }
   }, [signer])
+
+  useEffect(() => {
+    if (!client) {
+      return;
+    }
+
+    check(client, address, kind).then((isAttested) => {
+      setIsAttested(isAttested);
+    }).catch(console.error)
+
+  }, [client, address, kind])
 
   const attestMutation = useMutation({
     mutationFn: async () => {
@@ -45,6 +75,12 @@ export function useAttest(kind: string) {
           deadline: response.message.deadline,
         })
         await tx.wait();
+
+        if (client) {
+          const isAttested = await check(client, address, kind);
+          setIsAttested(isAttested);
+        }
+
       } catch (err) {
         // This shouldn't happen but ethers doesn't seem to like
         // function overloading.
@@ -58,6 +94,7 @@ export function useAttest(kind: string) {
   }
 
   return {
-    attest
+    attest,
+    isAttested
   }
 }

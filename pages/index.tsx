@@ -6,7 +6,6 @@ import { Header } from "@/components/header"
 import { ConnectHeader } from "@/components/connect-header"
 
 import { isDiamondHands } from "@/lib/diamond-hands"
-import { useIsAttested } from "@/hooks/useIsAttested";
 import { useAttest } from "@/hooks/useAttest";
 import { useDiamondBalance } from "@/hooks/useDiamondBalance";
 import { useAttestedVolume } from "@/hooks/useAttestedVolume";
@@ -32,11 +31,9 @@ function Main({ session, csrfToken }: SignedInProps) {
   const walletAddress = session?.user?.sub
 
   const diamondHands = isDiamondHands(walletAddress)
-  const isAttestedDiamondHands = useIsAttested(walletAddress, 'diamond-hand')
-  const isAttestedTwitter = useIsAttested(walletAddress, 'twitter')
-  const { attest: attestDiamondHands } = useAttest('diamond-hand')
-  const { attest: attestTwitter } = useAttest('twitter')
-  const { attest: attestVolume} = useAttest('volume')
+  const { attest: attestDiamondHands, isAttested: isAttestedDiamondHands } = useAttest('diamond-hand', walletAddress)
+  const { attest: attestTwitter, isAttested: isAttestedTwitter } = useAttest('twitter', walletAddress)
+  const { attest: attestVolume, isAttested: isAttestedVolume } = useAttest('volume', walletAddress)
 
   const volume = useTotalVolume(walletAddress);
   const attestedVolume  = useAttestedVolume(walletAddress);
