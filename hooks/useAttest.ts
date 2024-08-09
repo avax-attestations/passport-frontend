@@ -5,6 +5,7 @@ import { ethers, Typed } from 'ethers';
 import { usePublicClient } from 'wagmi'
 import { useSigner } from "@/hooks/useSigner";
 import { getProxy } from '@/lib/proxy';
+import { useToast } from '@/components/ui/use-toast';
 import proxyABI from '@/lib/proxy-abi';
 
 import { useEffect, useState } from 'react';
@@ -29,6 +30,7 @@ export function useAttest(kind: string, address: Address) {
   const signer = useSigner()
   const client = usePublicClient();
   const [isAttested, setIsAttested] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (signer) {
@@ -59,6 +61,11 @@ export function useAttest(kind: string, address: Address) {
         return
       }
       try {
+        const startToast = toast({
+          title: `Attesting ${kind}`,
+          description: 'This may take a few seconds...',
+          duration: 10000
+        })
         const tx = await proxy.attestByDelegation(
           Typed.string(kind), {
           schema: response.message.schema,
@@ -75,16 +82,28 @@ export function useAttest(kind: string, address: Address) {
           deadline: response.message.deadline,
         })
         await tx.wait();
+        startToast.dismiss();
 
         if (client) {
           const isAttested = await check(client, address, kind);
           setIsAttested(isAttested);
         }
 
+        toast({
+          title: `Attested ${kind}`,
+          description: `Successfully attested ${kind}`,
+          duration: 5000
+        })
       } catch (err) {
         // This shouldn't happen but ethers doesn't seem to like
         // function overloading.
         console.error(err)
+        toast({
+          variant: 'destructive',
+          title: `Error attesting ${kind}`,
+          duration: 5000,
+          description: (err as Error).message
+        })
       }
     }
   })
