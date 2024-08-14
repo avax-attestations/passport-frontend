@@ -101,7 +101,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col items-center justify-between pt-5">
-      <div className="sm:w-[640px] md:w-[768px] lg:w-[1024px]">
+      <div className="w-full sm:w-[640px] md:w-[768px] lg:w-[1024px]">
         <ConnectHeader
           signedIn={!!session}
           csrfToken={csrfToken}
