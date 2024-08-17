@@ -58,7 +58,12 @@ export const ATTESTATION_CONFIG = {
     'volume': {
         schemaUID: process.env.NEXT_PUBLIC_VOLUME_SCHEMA! as string,
         encoder: new SchemaEncoder('uint256 volume'),
+    },
+    'referral': {
+        schemaUID: process.env.NEXT_PUBLIC_REFERRAL_SCHEMA! as string,
+        encoder: new SchemaEncoder('address referrer,uint256 code')
     }
+
 };
 
 export const EAS_ADDRESS = process.env.NEXT_PUBLIC_EAS_ADDRESS! as Address;
@@ -77,3 +82,5 @@ export const JSON_RPC_ENDPOINT = (() => {
 export const dexVolumeResource = (address: string) => {
     return `https://barn.traderjoexyz.dev/v1/user/avalanche/${address}/lifetime-swaps-stats`;
 }
+export const REFERRAL_CODE_LIMIT = process.env.NEXT_PUBLIC_REFERRAL_CODE_LIMIT! as unknown as number;
+export const REFERRAL_RESOLVER_ADDRESS = process.env.NEXT_PUBLIC_REFERRAL_RESOLVER_ADDRESS! as Address;

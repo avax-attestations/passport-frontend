@@ -7,6 +7,7 @@ import { useSigner } from "@/hooks/useSigner";
 import { getProxy } from '@/lib/proxy';
 import { useToast } from '@/components/ui/use-toast';
 import proxyABI from '@/lib/proxy-abi';
+import { useSearchParams } from 'next/navigation'
 
 import { useEffect, useState } from 'react';
 
@@ -29,6 +30,7 @@ export function useAttest(kind: string, address: Address) {
   const [proxy, setProxy] = useState<ethers.Contract| null>(null)
   const signer = useSigner()
   const client = usePublicClient();
+  const params = useSearchParams();
   const [isAttested, setIsAttested] = useState(false);
   const { toast } = useToast();
 
@@ -52,7 +54,8 @@ export function useAttest(kind: string, address: Address) {
   const attestMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/attest/${kind}`, {
-        method: 'POST'
+        method: 'POST',
+        body: JSON.stringify(params ? Object.fromEntries(params.entries()) : {})
       })
       const data = await res.json()
       const response = jsonParseBigInt(data.signedResponse)

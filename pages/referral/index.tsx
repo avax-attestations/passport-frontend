@@ -10,8 +10,6 @@ import { useAttest } from "@/hooks/useAttest";
 import { useDiamondBalance } from "@/hooks/useDiamondBalance";
 import { useAttestedVolume } from "@/hooks/useAttestedVolume";
 import { useTotalVolume } from "@/hooks/useTotalVolume";
-import { useGenerateReferral } from '@/hooks/useGenerateReferral';
-import { useReferral } from '@/hooks/useReferral';
 
 interface SignedInProps {
   session: Auth['session']
@@ -35,14 +33,10 @@ function Main({ session, csrfToken }: SignedInProps) {
   const diamondHands = isDiamondHands(walletAddress)
   const { attest: attestDiamondHands, isAttested: isAttestedDiamondHands } = useAttest('diamond-hand', walletAddress)
   const { attest: attestTwitter, isAttested: isAttestedTwitter } = useAttest('twitter', walletAddress)
-  const { attest: attestVolume } = useAttest('volume', walletAddress)
-  const { attest: attestReferral, isAttested: isAttestedReferral} = useAttest('referral', walletAddress)
+  const { attest: attestVolume, isAttested: isAttestedVolume } = useAttest('volume', walletAddress)
 
   const volume = useTotalVolume(walletAddress);
   const attestedVolume  = useAttestedVolume(walletAddress);
-
-  const hasReferral = useReferral();
-  const generateReferral = useGenerateReferral(walletAddress);
 
   const socialConnections = [{
     name: 'github',
@@ -72,49 +66,32 @@ function Main({ session, csrfToken }: SignedInProps) {
         isConnected={true}
         walletAddress={walletAddress}
         score={totalPoints} />
-
       {walletAddress && (
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between items-center">
 
+          {socialConnections.map((props) => (
+            <AttestCardSocialConnection key={props.name} {...props} csrfToken={csrfToken} />
+          ))}
 
-          <AttestCard name="referral">
-            { hasReferral ? (
-              <><p>You have a referral code!</p>
-                {isAttestedReferral ? <p>Already attested</p> :
-                  <Button variant="passport" type="button" onClick={attestReferral}>Attest</Button>}</>
+          <AttestCard name="diamond">
+            {diamondHands ? (
+              <><p>You have diamond hands!</p>
+                {isAttestedDiamondHands ? <p>Already attested</p> :
+                  <Button variant="passport" type="button" onClick={attestDiamondHands}>Attest</Button>}</>
             ) : (
-              <p>You do not have a referral code</p>)}
+              <p>You do not have diamond hands</p>)}
           </AttestCard>
 
+          <AttestCard name="volume">
+            {volume ? (
+              <><p>You have Dex volume { volume } USD, attested { attestedVolume }!</p>
+                {attestedVolume == volume ? <p>No volume to attest</p> :
+                  <Button variant="passport" type="button" onClick={attestVolume}>Attest</Button>}</>
+            ) : (
+              <p>You do not have dex volume to attest</p>)}
+          </AttestCard>
 
-          { isAttestedReferral && (
-            <>
-            {socialConnections.map((props) => (
-              <AttestCardSocialConnection key={props.name} {...props} csrfToken={csrfToken} />
-            ))}
-
-            <AttestCard name="diamond">
-              {diamondHands ? (
-                <><p>You have diamond hands!</p>
-                  {isAttestedDiamondHands ? <p>Already attested</p> :
-                    <Button variant="passport" type="button" onClick={attestDiamondHands}>Attest</Button>}</>
-              ) : (
-                <p>You do not have diamond hands</p>)}
-            </AttestCard>
-
-            <AttestCard name="volume">
-              {volume ? (
-                <><p>You have Dex volume { volume } USD, attested { attestedVolume }!</p>
-                  {attestedVolume == volume ? <p>No volume to attest</p> :
-                    <Button variant="passport" type="button" onClick={attestVolume}>Attest</Button>}</>
-              ) : (
-                <p>You do not have dex volume to attest</p>)}
-            </AttestCard>
-            </>
-          )}
         </div>)}
-
-      <Button variant="passport" type="button" onClick={async () => alert(await generateReferral())}>Generate Referral Link</Button>
     </>
   )
 }
