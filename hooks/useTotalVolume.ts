@@ -10,7 +10,9 @@ export function useTotalVolume(address: Address) {
   useEffect(() => {
     const promise = getTotalVolume(address);
     promise.then((volume) => {
-     setVolume(volume);
+     if (volume !== undefined) {
+       setVolume(volume);
+     }
     }).catch(console.error)
   }, [address])
   return volume;
