@@ -32,6 +32,9 @@ export async function POST(req: NextRequest) {
   );
 
   const totalVolume = await getTotalVolume(walletAddress);
+  if (totalVolume === undefined) {
+    return NextResponse.json({ error: 'Unable to fetch volume' }, { status: 503})
+  }
   const attestedVolume = await getAttestedVolume(walletAddress, signer, getProxy(provider));
   const volumeToAttest = totalVolume - attestedVolume;
 

@@ -1,18 +1,21 @@
 import type { Address } from 'viem'
 import { EAS } from "@ethereum-attestation-service/eas-sdk";
-import { EAS_ADDRESS, ATTESTATION_CONFIG } from "@/lib/config";
+import { EAS_ADDRESS, ATTESTATION_CONFIG, dexVolumeResource } from "@/lib/config";
 import { ethers, Wallet, JsonRpcSigner } from 'ethers';
 
 
-// Returns the total USD volume for a given address on the
-// traderjoe dex.
-// NOTE: This function is currently a mock and will need to
-// be implemented when the required API's are available.
-// TJ API can return USD volume with arbitrary amount of
-// decimals however we want to round down to the lowest
-// dollar.
 export async function getTotalVolume(address: Address) {
-    return Math.floor(Date.now() / 10000000);
+  const url = dexVolumeResource(address);
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+    const json = await response.json();
+    return Math.floor(json.volume);
+  } catch (error: any) {
+    console.error(error.message);
+  }
 }
 
 // Returns the sum of all volume attested to a given `address`.

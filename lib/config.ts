@@ -73,3 +73,7 @@ export const JSON_RPC_ENDPOINT = (() => {
   }
 })();
 
+
+export const dexVolumeResource = (address: string) => {
+    return `https://barn.traderjoexyz.dev/v1/user/avalanche/${address}/lifetime-swaps-stats`;
+}
