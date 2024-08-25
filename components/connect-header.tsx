@@ -120,17 +120,11 @@ export const ConnectHeader: FC<ConnectHeaderProps> = ({
   type LogoColor = typeof colors[number];
   const [logoColor, setLogoColor] = useState(colors[0] as LogoColor)
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.metaKey || event.ctrlKey) return; // ignore right-click, etc.
-    const newIndex = (colors.indexOf(logoColor) + 1) % colors.length;
-    setLogoColor(colors[newIndex]);
-  };
-
   return (
     <div className="flex flex-row justify-between items-center mb-12 sm:mb-5 pl-5 pr-5 sm:pl-0 sm:pr-0">
-      <div className="flex flex-row" onClick={handleClick}>
+      <div className="flex flex-row">
         <Image src={`/DiamondHunt-logo-icon-${logoColor}.png`} alt={`Header`} width={50} height={50} />
-        <Image src={`/DiamondHunt-logotype-stroke-${logoColor}.png`} className="ml-2" alt={`Header`} width={92} height={50} />
+        {/*<Image src={`/DiamondHunt-logotype-stroke-${logoColor}.png`} className="ml-2" alt={`Header`} width={92} height={50} />*/}
       </div>
       <div>
         <ConnectKitButton.Custom>

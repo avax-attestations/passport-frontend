@@ -17,7 +17,8 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        passport: "bg-passport-pink uppercase text-white font-semibold rounded-sm text-xs w-full text-left hover:bg-passport-pink/90",
+        passport: "bg-passport-button uppercase text-[#171e1e] font-semibold rounded-sm text-xs w-full text-left hover:bg-passport-button/90",
+
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

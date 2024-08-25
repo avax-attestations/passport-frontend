@@ -27,7 +27,9 @@ const config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        "passport-pink": "hsl(var(--passport-pink))",
+        "passport-button": "hsl(var(--passport-button))",
+        "passport-card-background": "hsl(var(--passport-card-background))",
+        "passport-card-background-darker": "hsl(var(--passport-card-background-darker))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

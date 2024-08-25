@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 264, 71%, 4%;
+    --background: 180 13% 10%;
 
     --foreground: 60 9.1% 97.8%;
 
@@ -35,8 +35,10 @@
 
     --radius: 0.5rem;
 
-
-    --passport-pink: 277 100% 71%;
+    /* --passport-button: 35 100% 79%; */
+    --passport-button: 168 89% 82%;
+    --passport-card-background: 180 20% 20%;
+    --passport-card-background-darker: 180 14% 15%;
   }
 
   .dark {
