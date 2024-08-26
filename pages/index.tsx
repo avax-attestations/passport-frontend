@@ -4,13 +4,13 @@ import { AttestCard } from "@/components/attest-card"
 import { AttestCardSocialConnection } from "@/components/attest-card-social-connection"
 import { Header } from "@/components/header"
 import { ConnectHeader } from "@/components/connect-header"
+import Link from 'next/link';
 
 import { isDiamondHands } from "@/lib/diamond-hands"
 import { useAttest } from "@/hooks/useAttest";
 import { useDiamondBalance } from "@/hooks/useDiamondBalance";
 import { useAttestedVolume } from "@/hooks/useAttestedVolume";
 import { useTotalVolume } from "@/hooks/useTotalVolume";
-import { useGenerateReferral } from '@/hooks/useGenerateReferral';
 import { useReferral } from '@/hooks/useReferral';
 
 interface SignedInProps {
@@ -41,8 +41,8 @@ function Main({ session, csrfToken }: SignedInProps) {
   const volume = useTotalVolume(walletAddress);
   const attestedVolume  = useAttestedVolume(walletAddress);
 
-  const hasReferral = useReferral();
-  const generateReferral = useGenerateReferral(walletAddress);
+  const referral = useReferral();
+  const hasReferral = Object.keys(referral).length !== 0;
 
   const socialConnections = [{
     name: 'github',
@@ -74,8 +74,8 @@ function Main({ session, csrfToken }: SignedInProps) {
         score={totalPoints} />
 
       {walletAddress && (
-        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between items-center">
 
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between items-center">
 
           <AttestCard name="referral">
             { hasReferral ? (
@@ -113,8 +113,7 @@ function Main({ session, csrfToken }: SignedInProps) {
             </>
           )}
         </div>)}
-
-      <Button variant="passport" type="button" onClick={async () => alert(await generateReferral())}>Generate Referral Link</Button>
+        <Link href="/referral">Referral Page</Link>
     </>
   )
 }

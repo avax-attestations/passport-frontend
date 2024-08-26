@@ -4,7 +4,6 @@ import { useSigner } from '@/hooks/useSigner'
 import { getProxy} from '@/lib/proxy';
 import { useEffect, useState } from 'react';
 import { getAttestedVolume } from '@/lib/volume';
-import { ethers, Wallet } from 'ethers';
 
 
 export function useAttestedVolume(address: Address) {
