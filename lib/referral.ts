@@ -13,18 +13,27 @@ export async function isReferred(address: Address) {
 }
 
 
+export async function codeRedeemedBy(
+  client: PublicClient,
+  referrer: Address,
+  code: number,
+): Promise<Address> {
+  const user = await client.readContract({
+    address: REFERRAL_RESOLVER_ADDRESS,
+    abi: referralResolverAbi,
+    functionName: 'referralCodes',
+    args: [referrer, code],
+  }) as Address;
+  return user;
+}
+
+
 export async function referralCodeRedeemed(
   client: PublicClient,
   referrer: Address,
   code: number,
 ) {
-  const referredAddress = await client.readContract({
-    address: REFERRAL_RESOLVER_ADDRESS,
-    abi: referralResolverAbi,
-    functionName: 'referralCodes',
-    args: [referrer, code],
-  })
-  return referredAddress != ethers.ZeroAddress;
+  return (await codeRedeemedBy(client, referrer, code)) !== ethers.ZeroAddress;
 }
 
 
@@ -74,10 +83,13 @@ export async function getReferral(
   address: Address,
   walletClient: any,
   publicClient: any,
+  code: number|undefined = undefined
 ) {
-  const code = await nextUnclaimedReferral(address, publicClient);
-  if (code === 0) {
-    return '';
+  if (code === undefined) {
+    code = await nextUnclaimedReferral(address, publicClient);
+    if (code === 0) {
+      return '';
+    }
   }
   const signature = await signReferralCode(address, walletClient, code);
   return `${window.location.origin}?a=${address}&c=${code}&s=${signature}`;

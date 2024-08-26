@@ -8,7 +8,7 @@ export function useGenerateReferral(address: Address) {
   const publicClient = usePublicClient();
   const walletClient = useWalletClient();
 
-  return async () => {
-    return getReferral(address, walletClient, publicClient)
+  return async (code: number|undefined = undefined) => {
+    return await getReferral(address, walletClient, publicClient, code)
   }
 }
