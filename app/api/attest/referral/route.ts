@@ -4,7 +4,7 @@ import { isReferred, referralCodeRedeemed, verifyReferralCode } from "@/lib/refe
 import { signReferral } from '@/lib/signing/referral';
 import { getRedisInstance } from "@/lib/redis";
 import { Lock } from "@upstash/lock";
-import { ATTESTATION_DEADLINE, JSON_RPC_ENDPOINT } from "@/lib/config";
+import { ATTESTATION_DEADLINE, JSON_RPC_ENDPOINT, REFERRAL_CODE_LIMIT } from "@/lib/config";
 import { getWalletAddress } from "@/lib/utils";
 import { createPublicClient, http } from 'viem';
 
@@ -28,6 +28,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid code data' }, { status: 400 })
   }
 
+  // Check the signature is well formed.
+  const codePattern = /^avax-dh-(\d+$)/;
+  const codeMatch = codePattern.exec(data['c']);
+  if (!codeMatch) {
+    return NextResponse.json({ error: 'Invalid referral code' }, { status: 400 })
+  }
+
+  const code = parseInt(codeMatch[1]);
+  if (code > REFERRAL_CODE_LIMIT) {
+    return NextResponse.json({ error: 'Invalid referral code' }, { status: 400 })
+  }
+
   // Check the signature is valid
   if (!(await verifyReferralCode(data['c'], data['s'], data['a']))) {
     return NextResponse.json({ error: 'Invalid referral code' }, { status: 400 })
@@ -42,7 +54,7 @@ export async function POST(req: NextRequest) {
   const publicClient = createPublicClient({
     transport: http(JSON_RPC_ENDPOINT)
   })
-  if (await referralCodeRedeemed(publicClient, data['a'], data['c'])) {
+  if (await referralCodeRedeemed(publicClient, data['a'], code)) {
     return NextResponse.json({ error: 'Code redeemed' }, { status: 400 })
   }
 
@@ -61,7 +73,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(current);
       }
 
-      const signedResponse = await signReferral(walletAddress, data['a'], data['c']);
+      const signedResponse = await signReferral(walletAddress, data['a'], code);
       await redis.set(key, {signedResponse}, {ex: ATTESTATION_DEADLINE});
       return NextResponse.json({ signedResponse })
     }

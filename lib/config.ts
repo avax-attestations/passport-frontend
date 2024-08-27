@@ -84,3 +84,4 @@ export const dexVolumeResource = (address: string) => {
 }
 export const REFERRAL_CODE_LIMIT = process.env.NEXT_PUBLIC_REFERRAL_CODE_LIMIT! as unknown as number;
 export const REFERRAL_RESOLVER_ADDRESS = process.env.NEXT_PUBLIC_REFERRAL_RESOLVER_ADDRESS! as Address;
+export const REFERRAL_MESSAGE_PREFIX = 'dh-avax-';

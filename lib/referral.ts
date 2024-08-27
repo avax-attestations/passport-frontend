@@ -2,7 +2,7 @@ import type { Address, PublicClient, Signature } from 'viem'
 import { verifyMessage } from 'viem';
 import { getProxy } from "@/lib/proxy";
 import { ethers, JsonRpcProvider } from "ethers";
-import { JSON_RPC_ENDPOINT, REFERRAL_CODE_LIMIT, REFERRAL_RESOLVER_ADDRESS } from "@/lib/config"
+import { JSON_RPC_ENDPOINT, REFERRAL_CODE_LIMIT, REFERRAL_RESOLVER_ADDRESS, REFERRAL_MESSAGE_PREFIX } from "@/lib/config"
 import referralResolverAbi from '@/lib/referral-resolver-abi';
 
 
@@ -61,7 +61,7 @@ export async function signReferralCode(
 ) {
   return await walletClient.data.signMessage({
     address,
-    message: `${code}`,
+    message: `${REFERRAL_MESSAGE_PREFIX}${code}`,
   })
 }
 
@@ -92,5 +92,5 @@ export async function getReferral(
     }
   }
   const signature = await signReferralCode(address, walletClient, code);
-  return `${window.location.origin}?a=${address}&c=${code}&s=${signature}`;
+  return `${window.location.origin}?a=${address}&c=${REFERRAL_MESSAGE_PREFIX}${code}&s=${signature}`;
 }
