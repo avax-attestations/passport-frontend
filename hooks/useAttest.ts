@@ -26,7 +26,7 @@ async function check(client: PublicClient, address: Address, attestationType: st
   return true;
 }
 
-export function useAttest(kind: string, address: Address) {
+export function useAttest(kind: string, address: Address, attestUrl?: string) {
   const [proxy, setProxy] = useState<ethers.Contract| null>(null)
   const signer = useSigner()
   const client = usePublicClient();
@@ -53,7 +53,8 @@ export function useAttest(kind: string, address: Address) {
 
   const attestMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(`/api/attest/${kind}`, {
+      const url = attestUrl ? attestUrl : `/api/attest/${kind}`;
+      const res = await fetch(url, {
         method: 'POST',
         body: JSON.stringify(params ? Object.fromEntries(params.entries()) : {})
       })
