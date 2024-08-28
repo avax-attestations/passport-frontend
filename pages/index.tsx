@@ -3,10 +3,10 @@ import { Toaster } from "@/components/ui/toaster"
 import { Button } from "@/components/ui/button"
 import { AttestCard } from "@/components/attest-card"
 import { AttestCardSocialConnection } from "@/components/attest-card-social-connection"
+import { AttestCardNFTCollection } from "@/components/attest-card-nft-collection"
 import { AttestCardReferral } from "@/components/attest-card-referral"
 import { Header } from "@/components/header"
 import { ConnectHeader } from "@/components/connect-header"
-import Link from 'next/link';
 
 import { isDiamondHands } from "@/lib/diamond-hands"
 import { useAttest } from "@/hooks/useAttest";
@@ -15,6 +15,9 @@ import { useAttestedVolume } from "@/hooks/useAttestedVolume";
 import { useTotalVolume } from "@/hooks/useTotalVolume";
 import { useReferral } from '@/hooks/useReferral';
 import { useRootReferrer } from '@/hooks/useRootReferrer';
+import { useNFTCollection } from "@/hooks/useNFTCollection";
+import { NFT_COLLECTIONS } from "@/lib/config";
+
 
 interface SignedInProps {
   session: Auth['session']
@@ -39,6 +42,8 @@ function Main({ session, csrfToken }: SignedInProps) {
   const { attest: attestTwitter, isAttested: isAttestedTwitter } = useAttest('twitter', walletAddress)
   const { attest: attestVolume } = useAttest('volume', walletAddress)
   const { attest: attestReferral, isAttested: isAttestedReferral } = useAttest('referral', walletAddress)
+  const { attest: attestSmolJoe, isAttested: isAttestedSmolJoe } = useAttest('smol-joes', walletAddress, '/api/attest/nft?collection=smol-joes')
+  const { attest: attestOGSmolJoe, isAttested: isAttestedOGSmolJoe } = useAttest('og-smol-joes', walletAddress, '/api/attest/nft?collection=og-smol-joes')
 
   const volume = useTotalVolume(walletAddress);
   const attestedVolume = useAttestedVolume(walletAddress);
@@ -46,6 +51,8 @@ function Main({ session, csrfToken }: SignedInProps) {
   const referral = useReferral();
   const rootReferrer = useRootReferrer();
   const hasReferral = Object.keys(referral).length !== 0;
+  const hasSmolJoeForTime = useNFTCollection('smol-joes', walletAddress);
+  const hasOGSmolJoeForTime = useNFTCollection('og-smol-joes', walletAddress);
 
   const socialConnections = [{
     name: 'twitter',
@@ -95,6 +102,23 @@ function Main({ session, csrfToken }: SignedInProps) {
                 ) : (
                   <p>You do not have dex volume to attest</p>)}
               </AttestCard>
+
+              <AttestCardNFTCollection
+                name='smol-joes'
+                description='smol joes nft collection'
+                hasValidItem={hasSmolJoeForTime}
+                isAttested={isAttestedSmolJoe}
+                attest={attestSmolJoe}
+                holdTime={NFT_COLLECTIONS['smol-joes'].holdTime}
+              />
+              <AttestCardNFTCollection
+                name='og-smol-joes'
+                description='OG smol joes nft collection'
+                hasValidItem={hasOGSmolJoeForTime}
+                isAttested={isAttestedOGSmolJoe}
+                attest={attestOGSmolJoe}
+                holdTime={NFT_COLLECTIONS['og-smol-joes'].holdTime}
+              />
             </>
           )}
 
