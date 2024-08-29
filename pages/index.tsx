@@ -1,7 +1,9 @@
 import { useAuth, type Auth } from "@/hooks/useAuth";
+import { Toaster } from "@/components/ui/toaster"
 import { Button } from "@/components/ui/button"
 import { AttestCard } from "@/components/attest-card"
 import { AttestCardSocialConnection } from "@/components/attest-card-social-connection"
+import { AttestCardReferral } from "@/components/attest-card-referral"
 import { Header } from "@/components/header"
 import { ConnectHeader } from "@/components/connect-header"
 import Link from 'next/link';
@@ -12,6 +14,7 @@ import { useDiamondBalance } from "@/hooks/useDiamondBalance";
 import { useAttestedVolume } from "@/hooks/useAttestedVolume";
 import { useTotalVolume } from "@/hooks/useTotalVolume";
 import { useReferral } from '@/hooks/useReferral';
+import { useRootReferrer } from '@/hooks/useRootReferrer';
 
 interface SignedInProps {
   session: Auth['session']
@@ -36,12 +39,13 @@ function Main({ session, csrfToken }: SignedInProps) {
   const { attest: attestDiamondHands, isAttested: isAttestedDiamondHands } = useAttest('diamond-hand', walletAddress)
   const { attest: attestTwitter, isAttested: isAttestedTwitter } = useAttest('twitter', walletAddress)
   const { attest: attestVolume } = useAttest('volume', walletAddress)
-  const { attest: attestReferral, isAttested: isAttestedReferral} = useAttest('referral', walletAddress)
+  const { attest: attestReferral, isAttested: isAttestedReferral } = useAttest('referral', walletAddress)
 
   const volume = useTotalVolume(walletAddress);
-  const attestedVolume  = useAttestedVolume(walletAddress);
+  const attestedVolume = useAttestedVolume(walletAddress);
 
   const referral = useReferral();
+  const rootReferrer = useRootReferrer();
   const hasReferral = Object.keys(referral).length !== 0;
 
   const socialConnections = [{
@@ -77,43 +81,40 @@ function Main({ session, csrfToken }: SignedInProps) {
 
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between items-center">
 
-          <AttestCard name="referral">
-            { hasReferral ? (
-              <><p>You have a referral code!</p>
-                {isAttestedReferral ? <p>Already attested</p> :
-                  <Button variant="passport" type="button" onClick={attestReferral}>Attest</Button>}</>
-            ) : (
-              <p>You do not have a referral code</p>)}
-          </AttestCard>
-
-
-          { isAttestedReferral && (
+          {isAttestedReferral && (
             <>
-            {socialConnections.map((props) => (
-              <AttestCardSocialConnection key={props.name} {...props} csrfToken={csrfToken} />
-            ))}
+              {socialConnections.map((props) => (
+                <AttestCardSocialConnection key={props.name} {...props} csrfToken={csrfToken} />
+              ))}
 
-            <AttestCard name="diamond">
-              {diamondHands ? (
-                <><p>You have diamond hands!</p>
-                  {isAttestedDiamondHands ? <p>Already attested</p> :
-                    <Button variant="passport" type="button" onClick={attestDiamondHands}>Attest</Button>}</>
-              ) : (
-                <p>You do not have diamond hands</p>)}
-            </AttestCard>
+              <AttestCard name="diamond">
+                {diamondHands ? (
+                  <><p>You have diamond hands!</p>
+                    {isAttestedDiamondHands ? <p>Already attested</p> :
+                      <Button variant="passport" type="button" onClick={attestDiamondHands}>Attest</Button>}</>
+                ) : (
+                  <p>You do not have diamond hands</p>)}
+              </AttestCard>
 
-            <AttestCard name="volume">
-              {volume ? (
-                <><p>You have Dex volume { volume } USD, attested { attestedVolume }!</p>
-                  {attestedVolume == volume ? <p>No volume to attest</p> :
-                    <Button variant="passport" type="button" onClick={attestVolume}>Attest</Button>}</>
-              ) : (
-                <p>You do not have dex volume to attest</p>)}
-            </AttestCard>
+              <AttestCard name="volume">
+                {volume ? (
+                  <><p>You have Dex volume {volume} USD, attested {attestedVolume}!</p>
+                    {attestedVolume == volume ? <p>No volume to attest</p> :
+                      <Button variant="passport" type="button" onClick={attestVolume}>Attest</Button>}</>
+                ) : (
+                  <p>You do not have dex volume to attest</p>)}
+              </AttestCard>
             </>
           )}
+
+          <AttestCardReferral
+            hasReferral={hasReferral}
+            isAttested={isAttestedReferral}
+            attest={attestReferral}
+            walletAddress={walletAddress}
+            isRootReferrer={rootReferrer === walletAddress} />
+
         </div>)}
-        <Link href="/referral">Referral Page</Link>
     </>
   )
 }
@@ -136,6 +137,7 @@ export default function Home() {
           signOut={signOut}
         />
       </div>
+      <Toaster />
     </main>
   );
 }

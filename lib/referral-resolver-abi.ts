@@ -541,6 +541,6 @@ const referralResolverAbi = [
     "name": "NotPayable",
     "inputs": []
   }
-]
+] as const
 
 export default referralResolverAbi;

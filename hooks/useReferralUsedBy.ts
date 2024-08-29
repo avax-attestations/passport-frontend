@@ -20,7 +20,7 @@ export function useReferralUsedBy(
     promise.then((usedBy) => {
       setUser(usedBy);
     }).catch(console.error);
-  }, [address])
+  }, [address, code, publicClient])
 
   return user;
 }
