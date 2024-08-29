@@ -12,6 +12,17 @@ export async function isReferred(address: Address) {
   return (await proxy.userAuthenticationCount(address, 'referral')) != 0;
 }
 
+export async function rootReferrer(
+  client: PublicClient,
+): Promise<Address> {
+  const user = await client.readContract({
+    address: REFERRAL_RESOLVER_ADDRESS,
+    abi: referralResolverAbi,
+    functionName: 'rootReferrer',
+    args: [],
+  }) as Address;
+  return user;
+}
 
 export async function codeRedeemedBy(
   client: PublicClient,
@@ -22,7 +33,7 @@ export async function codeRedeemedBy(
     address: REFERRAL_RESOLVER_ADDRESS,
     abi: referralResolverAbi,
     functionName: 'referralCodes',
-    args: [referrer, code],
+    args: [referrer, BigInt(code)],
   }) as Address;
   return user;
 }

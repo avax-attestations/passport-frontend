@@ -4,12 +4,14 @@ import { isReferred, referralCodeRedeemed, verifyReferralCode } from "@/lib/refe
 import { signReferral } from '@/lib/signing/referral';
 import { getRedisInstance } from "@/lib/redis";
 import { Lock } from "@upstash/lock";
-import { ATTESTATION_DEADLINE, JSON_RPC_ENDPOINT, REFERRAL_CODE_LIMIT } from "@/lib/config";
+import { ATTESTATION_DEADLINE, JSON_RPC_ENDPOINT, REFERRAL_CODE_LIMIT, REFERRAL_MESSAGE_PREFIX } from "@/lib/config";
 import { getWalletAddress } from "@/lib/utils";
 import { createPublicClient, http } from 'viem';
 
 export const runtime = "edge";
 
+
+const codePattern = new RegExp(`^${REFERRAL_MESSAGE_PREFIX}(\\d+)$`);
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -29,7 +31,6 @@ export async function POST(req: NextRequest) {
   }
 
   // Check the signature is well formed.
-  const codePattern = /^avax-dh-(\d+$)/;
   const codeMatch = codePattern.exec(data['c']);
   if (!codeMatch) {
     return NextResponse.json({ error: 'Invalid referral code' }, { status: 400 })
@@ -74,14 +75,14 @@ export async function POST(req: NextRequest) {
       }
 
       const signedResponse = await signReferral(walletAddress, data['a'], code);
-      await redis.set(key, {signedResponse}, {ex: ATTESTATION_DEADLINE});
+      await redis.set(key, { signedResponse }, { ex: ATTESTATION_DEADLINE });
       return NextResponse.json({ signedResponse })
     }
     finally {
       await lock.release()
     }
   } else {
-    return NextResponse.json({ error: 'Too Many Requests' }, { status: 429})
+    return NextResponse.json({ error: 'Too Many Requests' }, { status: 429 })
   }
 
 }
