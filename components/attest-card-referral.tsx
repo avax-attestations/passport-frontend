@@ -10,6 +10,7 @@ import { Check, Copy } from 'lucide-react';
 
 import { Button } from "@/components/ui/button"
 import { AttestCard } from "@/components/attest-card"
+import { useShortener } from '@/hooks/useShortener'
 
 export type AttestCardReferralProps = {
   hasReferral: boolean
@@ -29,6 +30,7 @@ function ReferralCode({ walletAddress, code }: ReferralProps) {
   const redeemedBy = useReferralUsedBy(walletAddress, code);
   const disabled = redeemedBy != zeroAddress;
   const [link, setLink] = useState('');
+  const shortener = useShortener()
 
   const [isCopied, setIsCopied] = useState(false);
 
@@ -65,7 +67,7 @@ function ReferralCode({ walletAddress, code }: ReferralProps) {
             variant="passport"
             type="button"
             onClick={async () => {
-              setLink(await generateReferral(code))
+              setLink(await shortener(await generateReferral(code)))
             }}>
             ({code})&nbsp;
             {disabled ? `Referral Code Used by ${redeemedBy}` : 'Generate Referral Link'}
