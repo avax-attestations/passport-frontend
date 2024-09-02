@@ -19,7 +19,7 @@ export async function shorten(url: string, ttl: number = SHORT_URL_TTL) {
 
 
 export async function fetchShortLink(url: string) {
-  const shortenerURL = '/s';
+  const shortenerURL = '/api/shortener';
   try {
     const response = await fetch(shortenerURL, {
       method: 'POST',
