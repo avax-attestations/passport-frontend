@@ -31,7 +31,6 @@ function extractTwitterUsername(linkedId?: string) {
 
 function Main({ session, csrfToken }: SignedInProps) {
   const userName = session?.user?.userName ?? 'Anonymous';
-  const githubLinked = session?.user?.linkedAccounts?.['github']
   const twitterLinked = extractTwitterUsername(session?.user?.linkedAccounts?.['twitter'])
   const walletAddress = session?.user?.sub
 
@@ -49,14 +48,6 @@ function Main({ session, csrfToken }: SignedInProps) {
   const hasReferral = Object.keys(referral).length !== 0;
 
   const socialConnections = [{
-    name: 'github',
-    linked: githubLinked,
-    connectUrl: '/api/auth/signin/github',
-    description: 'Link Github account',
-    connectedDescription: `Connected as "${githubLinked}"`,
-    buttonLabel: 'Connect',
-    isAttested: false,
-  }, {
     name: 'twitter',
     linked: twitterLinked,
     connectUrl: '/api/auth/signin/twitter',
