@@ -129,12 +129,20 @@ export const AttestCardReferral: FC<AttestCardReferralProps> = ({
 
   return (
     <Card>
-      {hasReferral ? (
-        <><p>You have a referral code!</p>
-          {isAttested ? <GenerateReferrals walletAddress={walletAddress} /> :
-            <Button variant="passport" type="button" onClick={attest}>Attest</Button>}</>
+      { isAttested ? (
+        <>
+          <GenerateReferrals walletAddress={walletAddress} />
+        </>
       ) : (
-        <p>You do not have a referral code</p>)}
+        hasReferral ? (
+          <>
+            <p>You have a referral code!</p>
+            <Button variant="passport" type="button" onClick={attest}>Attest</Button>
+          </>
+        ) : (
+          <p>You do not have a referral code</p>
+        )
+      )}
     </Card>
   )
 }

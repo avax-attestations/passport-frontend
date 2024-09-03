@@ -36,23 +36,25 @@ export const AttestCardSocialConnection: FC<AttestCardSocialConnectionProps> = (
 
   return (
     <AttestCard name={name}>
-      {linked || isAttested ? (
-        <>
-          {isAttested ? <p>Already attested</p> : (
-            <>
-              <p>{connectedDescription}</p>
-              attest && (<Button variant="passport" type="button" onClick={attest}>Attest</Button>)
-            </>
-            )
-          }
-        </>
-      ) : (<>
-        <p>{description}</p>
-        <form action={connectUrl} method="post">
-          <input type="hidden" name="csrfToken" value={csrfToken} />
-          <input type="hidden" name="callbackUrl" value={callbackUrl} />
-          <Button variant="passport" type="submit">{buttonLabel}</Button>
-        </form></>)}
+      { isAttested ? (
+        <p>Already attested</p>
+      ) : (
+        linked ? (
+          <>
+            <p>{connectedDescription}</p>
+            <Button variant="passport" type="button" onClick={attest}>Attest</Button>
+          </>
+        ) : (
+          <>
+            <p>{description}</p>
+            <form action={connectUrl} method="post">
+              <input type="hidden" name="csrfToken" value={csrfToken} />
+              <input type="hidden" name="callbackUrl" value={callbackUrl} />
+              <Button variant="passport" type="submit">{buttonLabel}</Button>
+            </form>
+          </>
+        )
+      )}
     </AttestCard>
   )
 }
