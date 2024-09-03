@@ -88,3 +88,4 @@ export const REFERRAL_RESOLVER_ADDRESS = process.env.NEXT_PUBLIC_REFERRAL_RESOLV
 export const REFERRAL_MESSAGE_PREFIX = 'dh-avax-';
 
 export const SHORT_URL_TTL = 60*60*24*30;  // 30 days.
+export const JOE_API_KEY = process.env.JOE_API_KEY! as string;

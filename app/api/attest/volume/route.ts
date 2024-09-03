@@ -14,6 +14,22 @@ import { getProxy } from "@/lib/proxy";
 export const runtime = "edge";
 
 
+export async function GET(req: NextRequest) {
+  const session = await auth();
+  if (session === undefined || session === null) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 400 })
+  }
+
+  const walletAddress = getWalletAddress(session)
+  if (!walletAddress) {
+    return NextResponse.json({ error: 'No wallet address found in session' }, { status: 400 })
+  }
+
+  const totalVolume = await getTotalVolume(walletAddress);
+  return NextResponse.json({ volume: totalVolume });
+}
+
+
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (session === undefined || session === null) {

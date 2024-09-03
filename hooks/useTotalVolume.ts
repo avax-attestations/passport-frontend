@@ -1,14 +1,14 @@
 import type { Address } from 'viem';
 
 import { useEffect, useState } from 'react';
-import { getTotalVolume } from '@/lib/volume';
+import { fetchTotalVolume } from '@/lib/volume';
 
 
 export function useTotalVolume(address: Address) {
   const [volume, setVolume] = useState(0);
 
   useEffect(() => {
-    const promise = getTotalVolume(address);
+    const promise = fetchTotalVolume();
     promise.then((volume) => {
      if (volume !== undefined) {
        setVolume(volume);
