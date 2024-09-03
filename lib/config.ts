@@ -51,10 +51,6 @@ export const ATTESTATION_CONFIG = {
        schemaUID: process.env.NEXT_PUBLIC_TWITTER_ID_SCHEMA! as string,
        encoder: new SchemaEncoder('string twitterId'),
     },
-    'github': {
-        schemaUID: '0x6723811a6182bcb2fde3035b69a8e3bb854f1ff76413b71d5673ed653208d7ac',
-        encoder: new SchemaEncoder('string githubId'),
-    },
     'volume': {
         schemaUID: process.env.NEXT_PUBLIC_VOLUME_SCHEMA! as string,
         encoder: new SchemaEncoder('uint256 volume'),
