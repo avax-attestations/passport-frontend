@@ -36,11 +36,15 @@ export const AttestCardSocialConnection: FC<AttestCardSocialConnectionProps> = (
 
   return (
     <AttestCard name={name}>
-      {linked ? (
+      {linked || isAttested ? (
         <>
-          <p>{connectedDescription}</p>
-          {isAttested ? <p>Already attested</p> :
-            attest && (<Button variant="passport" type="button" onClick={attest}>Attest</Button>)}
+          {isAttested ? <p>Already attested</p> : (
+            <>
+              <p>{connectedDescription}</p>
+              attest && (<Button variant="passport" type="button" onClick={attest}>Attest</Button>)
+            </>
+            )
+          }
         </>
       ) : (<>
         <p>{description}</p>
