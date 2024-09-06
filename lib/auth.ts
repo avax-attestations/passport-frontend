@@ -7,6 +7,7 @@ import Twitter from "next-auth/providers/twitter";
 import { SiweMessage } from "siwe";
 import { cookies } from "next/headers";
 import { generate } from 'random-words';
+import { getRedisInstance } from '@/lib/redis';
 
 // Environment variables required here:
 //
@@ -18,20 +19,19 @@ import { generate } from 'random-words';
 
 const CSRF_TOKEN_COOKIE_NAME = "authjs.csrf-token";
 const SESSION_COOKIE_NAME = "authjs.session-token";
+const CACHED_SECRET_KEY = "next-auth-cached-secret";
 
-const encodedKeyCache = new Map<string, Uint8Array>();
-
-function encodeKey(key: string): Uint8Array {
-  let result = encodedKeyCache.get(key);
+async function encodeKey(key: string): Promise<Uint8Array> {
+  const redis = getRedisInstance();
+  let result = await redis.get(CACHED_SECRET_KEY);
   if (!result) {
-    result = new TextEncoder().encode(key);
-    encodedKeyCache.set(key, result);
+    await redis.set(CACHED_SECRET_KEY, result);
   }
-  return result;
+  return new TextEncoder().encode(key)
 }
 
 async function sign(secret: string, payload: JWTPayload) {
-  const key = encodeKey(secret);
+  const key = await encodeKey(secret);
   const token = new SignJWT(payload).setProtectedHeader({ alg: "HS256" })
 
   if (payload.iss) {
@@ -54,7 +54,7 @@ async function sign(secret: string, payload: JWTPayload) {
 }
 
 async function verify(secret: string, input: string): Promise<any> {
-  const key = encodeKey(secret);
+  const key = await encodeKey(secret);
   const { payload } = await jwtVerify(input, key, {
     algorithms: ["HS256"],
   });
@@ -145,7 +145,11 @@ export const config: NextAuthConfig = {
         return token
       }
 
-      const secret = encodedKeyCache.entries().next().value[0]
+      const redis = getRedisInstance();
+      const secret = await redis.get(CACHED_SECRET_KEY) as string;
+      if (!secret) {
+        throw new Error('No secret found in Redis')
+      }
       const currentSession = await verify(secret, sessionCookie)
 
       const linkedAccounts = (currentSession.linkedAccounts ?? {}) as Record<string, string>
