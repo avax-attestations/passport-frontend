@@ -4,7 +4,7 @@ import { signVolume } from '@/lib/signing/volume';
 
 import { getRedisInstance } from "@/lib/redis";
 import { Lock } from "@upstash/lock";
-import { ATTESTATION_DEADLINE, PRIVATE_KEY } from "@/lib/config";
+import { ATTESTATION_DEADLINE, PRIVATE_KEY, JSON_RPC_ENDPOINT } from "@/lib/config";
 import { getWalletAddress } from "@/lib/utils";
 
 import { Wallet, JsonRpcProvider } from 'ethers';
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No wallet address found in session' }, { status: 400 })
   }
 
-  const provider = new JsonRpcProvider(process.env.RPC_PROVIDER);
+  const provider = new JsonRpcProvider(JSON_RPC_ENDPOINT);
   const signer = new Wallet(
     PRIVATE_KEY,
     provider
