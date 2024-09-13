@@ -36,7 +36,7 @@ export async function getAttestedVolume(
   let totalVolume = 0;
   const attestationCount = await proxy.userAuthenticationCount(address, 'volume');
   for (let i = 0; i < attestationCount; i++) {
-    const attestationUID = await proxy.userAuthentication( address, 'volume', i);
+    const attestationUID = await proxy.userAuthentication(address, 'volume', i);
     const attestation = await eas.getAttestation(attestationUID);
     if (!attestation.revocationTime) {
       // XXX Using index 0 is a bit brittle here, properly parse the decoded
