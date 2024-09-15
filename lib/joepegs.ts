@@ -25,29 +25,29 @@ async function fetchJSON(url: string) {
 }
 
 
-// Get all the tokens for a given owner in a collection.
-export async function fetchCollectionItems(address: Address, collection: Address) : Promise<Array<{'tokenId': string}>> {
-  const url = `https://api.joepegs.dev/v3/users/${address}/items?collectionAddresses=${collection}`;
-  return await fetchJSON(url);
-}
-
-
-// Get all the transfer events for a given item.
-export async function fetchItemActivities(collection: Address, tokenId: string) : Promise<Array<{'fromAddress': string, 'toAddress': string, 'timestamp': string}>> {
-  const url = `https://api.joepegs.dev/v3/activities/avalanche/${collection}/tokens/${tokenId}?filters=transfer&filters=mint`
-  return await fetchJSON(url);
-}
-
 interface Activity {
-    from: string
-    to: string
-    time: number
+    fromAddress: string
+    toAddress: string
+    timestamp: number
 }
 interface Item {
     tokenId: string
     lastTransfer: Activity
 }
 
+
+// Get all the tokens for a given owner in a collection.
+export async function fetchCollectionItems(address: Address, collection: Address) : Promise<Array<Item>> {
+  const url = `https://api.joepegs.dev/v3/users/${address}/items?collectionAddresses=${collection}`;
+  return await fetchJSON(url);
+}
+
+
+// Get all the transfer events for a given item.
+export async function fetchItemActivities(collection: Address, tokenId: string) : Promise<Array<Activity>> {
+  const url = `https://api.joepegs.dev/v3/activities/avalanche/${collection}/tokens/${tokenId}?filters=transfer&filters=mint`
+  return await fetchJSON(url);
+}
 // Returns true if a user has held any token in a given collection
 // for a time period. It does this by checking when the token was
 // transferred to the users address.
@@ -64,9 +64,9 @@ export async function hasItemForTime(address:Address, collection: Address, secon
       lastTransfer: (await Promise.all(
         await fetchItemActivities(collection, tokenId as Address)
       )).map(activity => {
-        return {'from': activity.fromAddress, to: activity.toAddress, time: activity.timestamp as unknown as number};
+        return {fromAddress: activity.fromAddress, toAddress: activity.toAddress, timestamp: activity.timestamp as unknown as number};
       }).reduce((prev, current) =>
-        (prev && prev.time > current.time) ? prev : current
+        (prev && prev.timestamp > current.timestamp) ? prev : current
       )
     }
   }));
@@ -74,7 +74,7 @@ export async function hasItemForTime(address:Address, collection: Address, secon
   // Check if any of the activities are over `seconds` ago.
   const now = Math.floor(Date.now() / 1000);
   return activities.some(
-    (activity) => now - activity.lastTransfer.time > seconds
+    (activity) => now - activity.lastTransfer.timestamp > seconds
   );
 }
 
@@ -100,5 +100,4 @@ export async function attestedCollection(address: Address, collectionName: strin
   const provider = new JsonRpcProvider(JSON_RPC_ENDPOINT)
   const proxy = getProxy(provider);
   return (await proxy.userAuthenticationCount(address, collectionName)) >= 1;
-
 }
