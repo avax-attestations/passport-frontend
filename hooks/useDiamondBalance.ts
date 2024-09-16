@@ -15,7 +15,7 @@ async function check(client: PublicClient, address: Address) {
   })
 }
 
-export function useDiamondBalance(address: Address) {
+export function useDiamondBalance(address: Address, deps: Array<() => void>) {
   const client = usePublicClient();
   const [diamondBalance, setDiamondBalance] = useState(BigInt(0));
 
@@ -28,6 +28,6 @@ export function useDiamondBalance(address: Address) {
       setDiamondBalance(balance);
     }).catch(console.error)
 
-  }, [client, address])
+  }, [client, address, ...deps])
   return diamondBalance;
 }

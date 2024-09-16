@@ -18,7 +18,6 @@ import { useRootReferrer } from '@/hooks/useRootReferrer';
 import { useNFTCollection } from "@/hooks/useNFTCollection";
 import { NFT_COLLECTIONS } from "@/lib/config";
 
-
 interface SignedInProps {
   session: Auth['session']
   csrfToken: Auth['csrfToken']
@@ -65,7 +64,14 @@ function Main({ session, csrfToken }: SignedInProps) {
     attest: attestTwitter
   },]
 
-  const totalPoints = useDiamondBalance(walletAddress);
+  const totalPoints = useDiamondBalance(walletAddress, [
+    attestDiamondHands,
+    attestTwitter,
+    attestVolume,
+    attestReferral,
+    attestSmolJoe,
+    attestOGSmolJoe
+  ]);
 
   return (
     <>
