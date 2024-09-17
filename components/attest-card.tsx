@@ -24,7 +24,7 @@ export const BaseAttestCard: FC<BaseAttestCardProps> = ({
         {name.toUpperCase()}
         </p>
         <div className="text-gray-300 font-normal h-24 text-sm flex flex-col justify-between">
-        Reward: {reward}
+        Reward: {reward} Diamonds
         {children}
         </div>
       </div>
