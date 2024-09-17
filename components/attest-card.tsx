@@ -1,13 +1,17 @@
 import { FC, PropsWithChildren } from 'react'
 import Image from 'next/image'
+import { useReward } from '@/hooks/useReward';
 
-export type AttestCardProps = PropsWithChildren<{
-  name: string
+
+export type BaseAttestCardProps = PropsWithChildren<{
+  name: string,
+  reward: string
 }>
 
 
-export const AttestCard: FC<AttestCardProps> = ({
+export const BaseAttestCard: FC<BaseAttestCardProps> = ({
   name,
+  reward,
   children
 }) => {
   return (
@@ -20,9 +24,28 @@ export const AttestCard: FC<AttestCardProps> = ({
         {name.toUpperCase()}
         </p>
         <div className="text-gray-300 font-normal h-24 text-sm flex flex-col justify-between">
+        Reward: {reward}
         {children}
         </div>
       </div>
     </div>
+  )
+}
+
+
+export type AttestCardProps = PropsWithChildren<{
+  name: string,
+}>
+
+
+export const AttestCard: FC<AttestCardProps> = ({
+  name,
+  children
+}) => {
+  const reward = useReward(name)
+  return (
+    <BaseAttestCard name={name} reward={reward}>
+      {children}
+    </BaseAttestCard>
   )
 }

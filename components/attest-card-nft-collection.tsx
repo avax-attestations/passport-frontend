@@ -1,6 +1,5 @@
 
-import { FC, PropsWithChildren } from 'react'
-import Image from 'next/image'
+import { FC } from 'react'
 
 import { Button } from "@/components/ui/button"
 import { AttestCard } from "@/components/attest-card"
