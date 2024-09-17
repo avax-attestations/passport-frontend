@@ -5,6 +5,7 @@ import { AttestCard } from "@/components/attest-card"
 import { AttestCardSocialConnection } from "@/components/attest-card-social-connection"
 import { AttestCardNFTCollection } from "@/components/attest-card-nft-collection"
 import { AttestCardReferral } from "@/components/attest-card-referral"
+import { AttestCardVolume } from "@/components/attest-card-volume"
 import { Header } from "@/components/header"
 import { ConnectHeader } from "@/components/connect-header"
 
@@ -91,7 +92,7 @@ function Main({ session, csrfToken }: SignedInProps) {
                 <AttestCardSocialConnection key={props.name} {...props} csrfToken={csrfToken} />
               ))}
 
-              <AttestCard name="diamond">
+              <AttestCard name="diamond-hand">
                 {diamondHands ? (
                   <><p>You have diamond hands!</p>
                     {isAttestedDiamondHands ? <p>Already attested</p> :
@@ -100,14 +101,11 @@ function Main({ session, csrfToken }: SignedInProps) {
                   <p>You do not have diamond hands</p>)}
               </AttestCard>
 
-              <AttestCard name="volume">
-                {volume ? (
-                  <><p>You have Dex volume {volume} USD, attested {attestedVolume}!</p>
-                    {attestedVolume == volume ? <p>No volume to attest</p> :
-                      <Button variant="passport" type="button" onClick={attestVolume}>Attest</Button>}</>
-                ) : (
-                  <p>You do not have dex volume to attest</p>)}
-              </AttestCard>
+              <AttestCardVolume
+                name="volume"
+                volume={volume}
+                attestedVolume={attestedVolume}
+                attestVolume={attestVolume}/>
 
               <AttestCardNFTCollection
                 name='smol-joes'
