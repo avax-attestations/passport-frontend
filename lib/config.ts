@@ -87,7 +87,7 @@ export const JSON_RPC_ENDPOINT = (() => {
 
 
 export const dexVolumeResource = (address: string) => {
-    return `https://barn.traderjoexyz.dev/v1/user-lifetime-stats/avalanche/users/${address}/swap-stats`;
+    return `https://api.traderjoexyz.dev/v1/user-lifetime-stats/avalanche/users/${address}/swap-stats`;
 }
 
 export const REFERRAL_CODE_LIMIT = process.env.NEXT_PUBLIC_REFERRAL_CODE_LIMIT! as unknown as number;
@@ -96,6 +96,7 @@ export const REFERRAL_MESSAGE_PREFIX = 'dh-avax-';
 
 export const SHORT_URL_TTL = 60*60*24*30;  // 30 days.
 export const JOE_API_KEY = process.env.JOE_API_KEY! as string;
+export const DEX_API_KEY = process.env.DEX_API_KEY! as string;
 
 interface NFTCollection {
     [key: string]: any

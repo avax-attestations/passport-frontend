@@ -1,6 +1,6 @@
 import type { Address } from 'viem'
 import { EAS } from "@ethereum-attestation-service/eas-sdk";
-import { EAS_ADDRESS, ATTESTATION_CONFIG, JOE_API_KEY, dexVolumeResource } from "@/lib/config";
+import { EAS_ADDRESS, ATTESTATION_CONFIG, DEX_API_KEY, dexVolumeResource } from "@/lib/config";
 import { ethers, Wallet, JsonRpcSigner } from 'ethers';
 
 
@@ -9,7 +9,7 @@ export async function getTotalVolume(address: Address) {
   try {
     const response = await fetch(url, {
       headers: {
-        "x-traderjoe-api-key": JOE_API_KEY,
+        "x-traderjoe-api-key": DEX_API_KEY,
       }
     });
     if (!response.ok) {
