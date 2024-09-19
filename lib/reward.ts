@@ -13,7 +13,7 @@ async function getRewarderAddress(
     abi: proxyAbi,
     functionName: 'attestationTypes',
     args: [attestationType],
-  }) as [any, Address, any];
+  });
   return rewarderAddress;
 }
 
@@ -29,19 +29,19 @@ const rewarderABI = [{
     "type":"uint256",
   }],
   "stateMutability":"view"
-}]
+}] as const;
 
 async function getReward(
   rewarder: Address,
   client: PublicClient,
-  data: string
+  data: Address
 ): Promise<bigint> {
   const reward = await client.readContract({
     address: rewarder,
     abi: rewarderABI,
     functionName: 'rewardFor',
     args: [data],
-  }) as bigint;
+  });
   return reward;
 }
 
