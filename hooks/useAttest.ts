@@ -59,6 +59,15 @@ export function useAttest(kind: string, address: Address, attestUrl?: string) {
         body: JSON.stringify(params ? Object.fromEntries(params.entries()) : {})
       })
       const data = await res.json()
+      if (res.status !== 200) {
+        toast({
+          variant: 'destructive',
+          title: `Error attesting ${kind}`,
+          duration: 5000,
+          description: data.error
+        })
+        return
+      }
       const response = jsonParseBigInt(data.signedResponse)
       if (!proxy) {
         // TODO use toast or something similar to report an error, though I think we should never reach this point
