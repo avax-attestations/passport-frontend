@@ -14,12 +14,15 @@ export const Header: FC<HeaderProps> = ({
   score,
   userName
 }) => {
+
+  const headerLogo = walletAddress? '/api/avatar?walletAddress=' + walletAddress : '/header-logo.png'
+
   return (
     <div>
       <div className="rounded-sm w-full pl-5 pr-5 sm:pl-0 sm:pr-0">
         <div className="rounded-t-sm bg-passport-card-background flex flex-col sm:flex-row justify-between items-left w-full p-5 sm:p-10 overflow-hidden">
           <div className="flex flex-row">
-            <Image src={`/header-logo.png`} className="mr-4" alt={`Header`} width={100} height={100} />
+            <Image src={headerLogo} className="mr-4" alt={`Header`} width={100} height={100} />
             <div className="flex flex-col justify-center w-full">
               <span className="text-passport-button font-bold text-2xl">{userName}</span>
               <span className="text-sm">{walletAddress}</span>
