@@ -7,7 +7,6 @@ import Twitter from "next-auth/providers/twitter";
 import { SiweMessage } from "siwe";
 import { cookies } from "next/headers";
 import { generate } from 'random-words';
-import { getRedisInstance } from '@/lib/redis';
 
 // Environment variables required here:
 //
@@ -16,22 +15,15 @@ import { getRedisInstance } from '@/lib/redis';
 // - GITHUB_SECRET
 // - TWITTER_ID
 // - TWITTER_SECRET
-
+const secret = process.env.JWT_SECRET!
+if (!secret) {
+  throw new Error("JWT_SECRET is required");
+}
+const encodedSecret = new TextEncoder().encode(secret);
 const CSRF_TOKEN_COOKIE_NAME = "authjs.csrf-token";
 const SESSION_COOKIE_NAME = "authjs.session-token";
-const CACHED_SECRET_KEY = "next-auth-cached-secret";
 
-async function encodeKey(key: string): Promise<Uint8Array> {
-  const redis = getRedisInstance();
-  let result = await redis.get(CACHED_SECRET_KEY);
-  if (!result) {
-    await redis.set(CACHED_SECRET_KEY, result);
-  }
-  return new TextEncoder().encode(key)
-}
-
-async function sign(secret: string, payload: JWTPayload) {
-  const key = await encodeKey(secret);
+async function sign(payload: JWTPayload) {
   const token = new SignJWT(payload).setProtectedHeader({ alg: "HS256" })
 
   if (payload.iss) {
@@ -50,12 +42,11 @@ async function sign(secret: string, payload: JWTPayload) {
     token.setExpirationTime(payload.exp);
   }
 
-  return token.sign(key);
+  return token.sign(encodedSecret);
 }
 
-async function verify(secret: string, input: string): Promise<any> {
-  const key = await encodeKey(secret);
-  const { payload } = await jwtVerify(input, key, {
+async function verify(input: string): Promise<any> {
+  const { payload } = await jwtVerify(input, encodedSecret, {
     algorithms: ["HS256"],
   });
   return payload;
@@ -85,7 +76,7 @@ export const config: NextAuthConfig = {
         throw new Error('Token should be an object')
       }
       token.exp = Math.floor(Date.now() / 1000) + maxAge;
-      return sign(secret, token);
+      return sign(token);
     },
     async decode({
       token,
@@ -94,7 +85,7 @@ export const config: NextAuthConfig = {
       if (!token || typeof secret !== 'string') {
         return null
       }
-      return verify(secret, token);
+      return verify(token);
     },
   },
 
@@ -145,12 +136,7 @@ export const config: NextAuthConfig = {
         return token
       }
 
-      const redis = getRedisInstance();
-      const secret = await redis.get(CACHED_SECRET_KEY) as string;
-      if (!secret) {
-        throw new Error('No secret found in Redis')
-      }
-      const currentSession = await verify(secret, sessionCookie)
+      const currentSession = await verify(sessionCookie)
 
       const linkedAccounts = (currentSession.linkedAccounts ?? {}) as Record<string, string>
       switch (provider) {
