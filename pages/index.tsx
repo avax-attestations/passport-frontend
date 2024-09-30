@@ -105,7 +105,7 @@ function Main({ session, csrfToken }: SignedInProps) {
                 name="volume"
                 volume={volume}
                 attestedVolume={attestedVolume}
-                attestVolume={attestVolume}/>
+                attestVolume={attestVolume} />
 
               <AttestCardNFTCollection
                 name='smol-joes'
@@ -123,6 +123,9 @@ function Main({ session, csrfToken }: SignedInProps) {
                 attest={attestOGSmolJoe}
                 holdTime={NFT_COLLECTIONS['og-smol-joes'].holdTime}
               />
+              {/* filler div to remove the "hole" between the two smol joe cards */}
+              <div className="sm:w-[205px] md:w-[245px] lg:w-[330px]">
+              </div>
             </>
           )}
 

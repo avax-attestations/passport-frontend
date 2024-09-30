@@ -9,7 +9,6 @@ import { useState } from 'react'
 import { Check, Copy } from 'lucide-react';
 
 import { Button } from "@/components/ui/button"
-import { AttestCard } from "@/components/attest-card"
 import { useShortener } from '@/hooks/useShortener'
 
 export type AttestCardReferralProps = {
@@ -97,13 +96,36 @@ const GenerateReferrals: FC<GenerateReferralsProps> = ({
   )
 }
 
-const Card: FC<PropsWithChildren<{}>> = ({ children }) => {
+interface CardProps {
+  walletAddress: Address
+}
+const Card: FC<PropsWithChildren<CardProps>> = ({ walletAddress, children }) => {
+  let usedCodeCount = 0;
+
+  for (let i = 1; i <= REFERRAL_CODE_LIMIT; i++) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const redeemedBy = useReferralUsedBy(walletAddress, i);
+    const disabled = redeemedBy != zeroAddress;
+    if (disabled) {
+      usedCodeCount++;
+    }
+  }
+
   return (
-    <div className="rounded-sm w-full mt-5">
-      <div className="rounded-t-sm bg-passport-card-background flex flex-col items-center w-full pb-10 pt-10">
-        <Image src={`/card-logos/referral.png`} alt="referral" width={75} height={75} />
+    <div className="rounded-sm w-full pl-5 pr-5 sm:pl-0 sm:pr-0 flex flex-col sm:flex-row mt-5">
+      <div className="rounded-t-sm bg-passport-card-background flex items-center w-full pb-10 pt-10 ">
+        <Image className='m-auto' src={`/card-logos/referral.png`} alt="referral" width={75} height={75} />
       </div>
-      <div className="rounded-b-sm flex flex-col pb-2 bg-passport-card-background-darker w-full">
+      <div className="rounded-b-sm flex flex-col pb-2 pl-5 bg-passport-card-background-darker w-full">
+        <h1 className="text-3xl mt-6 mb-12">Referral Program</h1>
+        <div className='mb-3 flex flex-row'>
+          <div>
+            <span>Referrals:</span><span>{REFERRAL_CODE_LIMIT}</span>
+          </div>
+          <div className='ml-12'>
+            <span>Used:</span><span>{usedCodeCount}</span>
+          </div>
+        </div>
         <div className="text-gray-300 font-normal text-sm flex flex-col justify-between w-full">
           {children}
         </div>
@@ -121,15 +143,15 @@ export const AttestCardReferral: FC<AttestCardReferralProps> = ({
 }) => {
   if (!hasReferral && isRootReferrer) {
     return (
-      <Card>
+      <Card walletAddress={walletAddress}>
         <GenerateReferrals walletAddress={walletAddress} />
       </Card>
     )
   }
 
   return (
-    <Card>
-      { isAttested ? (
+    <Card walletAddress={walletAddress}>
+      {isAttested ? (
         <>
           <GenerateReferrals walletAddress={walletAddress} />
         </>
