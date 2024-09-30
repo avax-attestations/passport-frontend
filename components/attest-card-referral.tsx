@@ -1,4 +1,12 @@
 import { FC, PropsWithChildren } from 'react'
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 import Image from 'next/image'
 import type { Address } from 'viem'
 import { REFERRAL_CODE_LIMIT } from "@/lib/config";
@@ -159,7 +167,16 @@ export const AttestCardReferral: FC<AttestCardReferralProps> = ({
         hasReferral ? (
           <>
             <p>You have a referral code!</p>
-            <Button variant="passport" type="button" onClick={attest}>Attest</Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button variant="passport" type="button" onClick={attest}>Attest</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>This will require a transaction to be signed</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </>
         ) : (
           <p>You do not have a referral code</p>
