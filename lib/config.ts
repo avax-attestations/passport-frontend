@@ -33,6 +33,11 @@ if (!PROXY_CONTRACT_ADDRESS) {
   throw new Error('PROXY_CONTRACT_ADDRESS is not set')
 }
 
+export const AASSCAN_URL = process.env.NEXT_PUBLIC_AASSCAN_URL!
+if (!AASSCAN_URL) {
+  throw new Error('AASSCAN_URL is not set')
+}
+
 export const PRIVATE_KEY = process.env.PRIVATE_KEY!;
 
 export const DIAMOND_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_DIAMOND_TOKEN_ADDRESS! as Address;

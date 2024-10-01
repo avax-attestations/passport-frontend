@@ -1,17 +1,20 @@
 import { useMutation } from '@tanstack/react-query';
 import type { Address, PublicClient } from 'viem'
+import { decodeEventLog } from 'viem'
 import { jsonParseBigInt } from "@/lib/utils"
 import { ethers, Typed } from 'ethers';
 import { usePublicClient } from 'wagmi'
 import { useSigner } from "@/hooks/useSigner";
 import { getProxy } from '@/lib/proxy';
 import { useToast } from '@/components/ui/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 import proxyABI from '@/lib/proxy-abi';
+import easABI from '@/lib/eas-abi';
 import { useSearchParams } from 'next/navigation'
 
 import { useEffect, useState } from 'react';
 
-import { PROXY_CONTRACT_ADDRESS } from "@/lib/config"
+import { PROXY_CONTRACT_ADDRESS, AASSCAN_URL } from "@/lib/config"
 
 async function check(client: PublicClient, address: Address, attestationType: string) {
   const attestationCount = await client.readContract({
@@ -26,8 +29,39 @@ async function check(client: PublicClient, address: Address, attestationType: st
   return true;
 }
 
+async function getAttestationUid(hash: `0x${string}`, client: PublicClient) {
+  const txReceipt = await client.getTransactionReceipt({ hash })
+  if (!txReceipt) {
+    return null;
+  }
+  const logs = txReceipt.logs;
+  if (!logs) {
+    return null;
+  }
+  const uids = []
+  for (const log of logs) {
+    try {
+      const decodedLog = decodeEventLog({
+        abi: easABI,
+        ...log
+      })
+
+      if (decodedLog.eventName === 'Attested') {
+        uids.push(decodedLog.args.uid);
+      }
+    } catch (_err) {
+      continue
+    }
+  }
+  if (uids.length !== 1) {
+    console.warn('Expected exactly one attestation log, got', uids.length)
+    return null;
+  }
+  return uids[0]
+}
+
 export function useAttest(kind: string, address: Address, attestUrl?: string) {
-  const [proxy, setProxy] = useState<ethers.Contract| null>(null)
+  const [proxy, setProxy] = useState<ethers.Contract | null>(null)
   const signer = useSigner()
   const client = usePublicClient();
   const params = useSearchParams();
@@ -94,9 +128,11 @@ export function useAttest(kind: string, address: Address, attestUrl?: string) {
           signature: response.signature,
           deadline: response.message.deadline,
         })
-        await tx.wait();
+        const receipt = await tx.wait();
+        const hash = receipt.hash;
         startToast.dismiss();
-
+        const attestationUid = client && hash ? await getAttestationUid(hash, client) : '';
+        const attestationUrl = `${AASSCAN_URL}/attestation?uid=${attestationUid}&chain=${client?.chain?.name}`
         if (client) {
           const isAttested = await check(client, address, kind);
           setIsAttested(isAttested);
@@ -105,7 +141,10 @@ export function useAttest(kind: string, address: Address, attestUrl?: string) {
         toast({
           title: `Attested ${kind}`,
           description: `Successfully attested ${kind}`,
-          duration: 5000
+          action: <ToastAction altText="View on aasscan.org"
+            onClick={() => window.open(attestationUrl)}
+          >View on aasscan.org</ToastAction>,
+          duration: 10000
         })
       } catch (err) {
         // This shouldn't happen but ethers doesn't seem to like
