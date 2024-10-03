@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     // Return the modified avatar image as a PNG
     return pngResponse(recoloredAvatarBuffer,
-                       'public, max-age=31536000, immutable');
+                       'max-age=86400');
   } catch (error) {
     console.error('Error generating avatar:', error);
     return pngResponse(headerLogoBuffer);

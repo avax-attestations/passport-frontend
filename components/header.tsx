@@ -15,7 +15,7 @@ export const Header: FC<HeaderProps> = ({
   userName
 }) => {
 
-  const headerLogo = walletAddress? '/api/avatar?walletAddress=' + walletAddress : '/header-logo.png'
+  const headerLogo = walletAddress? '/api/avatar?stub=2&walletAddress=' + walletAddress : '/header-logo.png'
 
   return (
     <div>
