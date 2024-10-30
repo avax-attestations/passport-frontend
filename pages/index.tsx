@@ -44,6 +44,8 @@ function Main({ session, csrfToken }: SignedInProps) {
   const { attest: attestReferral, isAttested: isAttestedReferral } = useAttest('referral', walletAddress)
   const { attest: attestSmolJoe, isAttested: isAttestedSmolJoe } = useAttest('smol-joes', walletAddress, '/api/attest/nft?collection=smol-joes')
   const { attest: attestOGSmolJoe, isAttested: isAttestedOGSmolJoe } = useAttest('og-smol-joes', walletAddress, '/api/attest/nft?collection=og-smol-joes')
+  const { attest: attestNochillio, isAttested: isAttestedNochillio} = useAttest('nochillio', walletAddress, '/api/attest/nft?collection=nochillio')
+  const { attest: attestBruskie, isAttested: isAttestedBruskie} = useAttest('bruskie', walletAddress, '/api/attest/nft?collection=bruskie')
 
   const volume = useTotalVolume(walletAddress);
   const attestedVolume = useAttestedVolume(walletAddress);
@@ -53,6 +55,8 @@ function Main({ session, csrfToken }: SignedInProps) {
   const hasReferral = Object.keys(referral).length !== 0;
   const hasSmolJoeForTime = useNFTCollection('smol-joes', walletAddress);
   const hasOGSmolJoeForTime = useNFTCollection('og-smol-joes', walletAddress);
+  const hasNochillioForTime = useNFTCollection('nochillio', walletAddress);
+  const hasBruskieForTime = useNFTCollection('bruskies', walletAddress);
 
   const socialConnections = [{
     name: 'twitter',
@@ -122,6 +126,22 @@ function Main({ session, csrfToken }: SignedInProps) {
                 isAttested={isAttestedOGSmolJoe}
                 attest={attestOGSmolJoe}
                 holdTime={NFT_COLLECTIONS['og-smol-joes'].holdTime}
+              />
+              <AttestCardNFTCollection
+                name='nochillio'
+                description='nochillio nft collection'
+                hasValidItem={hasNochillioForTime}
+                isAttested={isAttestedNochillio}
+                attest={attestNochillio}
+                holdTime={NFT_COLLECTIONS['nochillio'].holdTime}
+              />
+              <AttestCardNFTCollection
+                name='bruskies'
+                description='bruskies nft collection'
+                hasValidItem={hasBruskieForTime}
+                isAttested={isAttestedBruskie}
+                attest={attestBruskie}
+                holdTime={NFT_COLLECTIONS['bruskies'].holdTime}
               />
               {/* filler div to remove the "hole" between the two smol joe cards */}
               <div className="sm:w-[205px] md:w-[245px] lg:w-[330px]">
