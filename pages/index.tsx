@@ -45,7 +45,7 @@ function Main({ session, csrfToken }: SignedInProps) {
   const { attest: attestSmolJoe, isAttested: isAttestedSmolJoe } = useAttest('smol-joes', walletAddress, '/api/attest/nft?collection=smol-joes')
   const { attest: attestOGSmolJoe, isAttested: isAttestedOGSmolJoe } = useAttest('og-smol-joes', walletAddress, '/api/attest/nft?collection=og-smol-joes')
   const { attest: attestNochillio, isAttested: isAttestedNochillio} = useAttest('nochillio', walletAddress, '/api/attest/nft?collection=nochillio')
-  const { attest: attestBruskie, isAttested: isAttestedBruskie} = useAttest('bruskie', walletAddress, '/api/attest/nft?collection=bruskie')
+  const { attest: attestBruskies, isAttested: isAttestedBruskies} = useAttest('bruskies', walletAddress, '/api/attest/nft?collection=bruskies')
 
   const volume = useTotalVolume(walletAddress);
   const attestedVolume = useAttestedVolume(walletAddress);
@@ -56,7 +56,7 @@ function Main({ session, csrfToken }: SignedInProps) {
   const hasSmolJoeForTime = useNFTCollection('smol-joes', walletAddress);
   const hasOGSmolJoeForTime = useNFTCollection('og-smol-joes', walletAddress);
   const hasNochillioForTime = useNFTCollection('nochillio', walletAddress);
-  const hasBruskieForTime = useNFTCollection('bruskies', walletAddress);
+  const hasBruskiesForTime = useNFTCollection('bruskies', walletAddress);
 
   const socialConnections = [{
     name: 'twitter',
@@ -138,9 +138,9 @@ function Main({ session, csrfToken }: SignedInProps) {
               <AttestCardNFTCollection
                 name='bruskies'
                 description='bruskies nft collection'
-                hasValidItem={hasBruskieForTime}
-                isAttested={isAttestedBruskie}
-                attest={attestBruskie}
+                hasValidItem={hasBruskiesForTime}
+                isAttested={isAttestedBruskies}
+                attest={attestBruskies}
                 holdTime={NFT_COLLECTIONS['bruskies'].holdTime}
               />
               {/* filler div to remove the "hole" between the two smol joe cards */}
