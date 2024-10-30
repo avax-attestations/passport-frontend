@@ -74,8 +74,15 @@ export const ATTESTATION_CONFIG: AttestationConfig = {
     'og-smol-joes': {
         schemaUID: process.env.NEXT_PUBLIC_NFT_HOLDER_SCHEMA! as string,
         encoder: new SchemaEncoder('address collection')
+    },
+    'nochillio': {
+        schemaUID: process.env.NEXT_PUBLIC_NFT_HOLDER_SCHEMA! as string,
+        encoder: new SchemaEncoder('address collection')
+    },
+    'bruskies': {
+        schemaUID: process.env.NEXT_PUBLIC_NFT_HOLDER_SCHEMA! as string,
+        encoder: new SchemaEncoder('address collection')
     }
-
 };
 
 export const EAS_ADDRESS = process.env.NEXT_PUBLIC_EAS_ADDRESS! as Address;
@@ -114,6 +121,13 @@ export const NFT_COLLECTIONS: NFTCollection = {
   'og-smol-joes': {
     address: '0x5bEb759F7769193a8e401bb2d7CaD22bACb930d5',
     holdTime: 30 * 60 * 24 * 365,
+  },
+  'nochillio': {
+    address: '0x204b3EE3f9bDCDe258BA3F74dE76ea8Eedf0A36A',
+    holdTime: 60 * 69 * 24,
+  },
+  'bruskies': {
+    address: '0xb563420b7b8119114968C70093c4966630ad16d3',
+    holdTime: 60 * 69 * 24,
   }
-
 }
