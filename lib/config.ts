@@ -82,6 +82,14 @@ export const ATTESTATION_CONFIG: AttestationConfig = {
     'bruskies': {
         schemaUID: process.env.NEXT_PUBLIC_NFT_HOLDER_SCHEMA! as string,
         encoder: new SchemaEncoder('address collection')
+    },
+    'peons': {
+        schemaUID: process.env.NEXT_PUBLIC_NFT_HOLDER_SCHEMA! as string,
+        encoder: new SchemaEncoder('address collection')
+    },
+    'steady': {
+        schemaUID: process.env.NEXT_PUBLIC_NFT_HOLDER_SCHEMA! as string,
+        encoder: new SchemaEncoder('address collection')
     }
 };
 
@@ -116,18 +124,26 @@ interface NFTCollection {
 export const NFT_COLLECTIONS: NFTCollection = {
   'smol-joes': {
     address: '0xb449701a5ebb1d660cb1d206a94f151f5a544a81',
-    holdTime: 60 * 60 * 24 * 365,
+    holdTime: 60 * 60 * 24 * 365,  // 1 year
   },
   'og-smol-joes': {
     address: '0x5bEb759F7769193a8e401bb2d7CaD22bACb930d5',
-    holdTime: 30 * 60 * 24 * 365,
+    holdTime: 30 * 60 * 24 * 365,  // half year
   },
   'nochillio': {
     address: '0x204b3EE3f9bDCDe258BA3F74dE76ea8Eedf0A36A',
-    holdTime: 60 * 69 * 24,
+    holdTime: 60 * 60 * 24, // one day
   },
   'bruskies': {
     address: '0xb563420b7b8119114968C70093c4966630ad16d3',
-    holdTime: 60 * 69 * 24,
+    holdTime: 60 * 60 * 24,
+  },
+  'peons': {
+    address: '0xe6cc79ca731a5e406024015bb2de5346b52eca2f',
+    holdTime: 30 * 60 * 24 * 365,
+  },
+  'steady': {
+    address: '0xcdAB7d987f0198EDB440D014ed1E71256A0e3e7A',
+    holdTime: 30 * 60 * 24 * 365,
   }
 }

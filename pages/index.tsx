@@ -46,6 +46,8 @@ function Main({ session, csrfToken }: SignedInProps) {
   const { attest: attestOGSmolJoe, isAttested: isAttestedOGSmolJoe } = useAttest('og-smol-joes', walletAddress, '/api/attest/nft?collection=og-smol-joes')
   const { attest: attestNochillio, isAttested: isAttestedNochillio} = useAttest('nochillio', walletAddress, '/api/attest/nft?collection=nochillio')
   const { attest: attestBruskies, isAttested: isAttestedBruskies} = useAttest('bruskies', walletAddress, '/api/attest/nft?collection=bruskies')
+  const { attest: attestPeons, isAttested: isAttestedPeons} = useAttest('peons', walletAddress, '/api/attest/nft?collection=peons')
+  const { attest: attestSteady, isAttested: isAttestedSteady} = useAttest('steady', walletAddress, '/api/attest/nft?collection=steady')
 
   const volume = useTotalVolume(walletAddress);
   const attestedVolume = useAttestedVolume(walletAddress);
@@ -57,6 +59,8 @@ function Main({ session, csrfToken }: SignedInProps) {
   const hasOGSmolJoeForTime = useNFTCollection('og-smol-joes', walletAddress);
   const hasNochillioForTime = useNFTCollection('nochillio', walletAddress);
   const hasBruskiesForTime = useNFTCollection('bruskies', walletAddress);
+  const hasPeonsForTime = useNFTCollection('peons', walletAddress);
+  const hasSteadyForTime = useNFTCollection('steady', walletAddress);
 
   const socialConnections = [{
     name: 'twitter',
@@ -143,9 +147,25 @@ function Main({ session, csrfToken }: SignedInProps) {
                 attest={attestBruskies}
                 holdTime={NFT_COLLECTIONS['bruskies'].holdTime}
               />
+              <AttestCardNFTCollection
+                name='peons'
+                description='peons nft collection'
+                hasValidItem={hasPeonsForTime}
+                isAttested={isAttestedPeons}
+                attest={attestPeons}
+                holdTime={NFT_COLLECTIONS['peons'].holdTime}
+              />
+            <AttestCardNFTCollection
+                name='steady'
+                description='steady nft collection'
+                hasValidItem={hasSteadyForTime}
+                isAttested={isAttestedSteady}
+                attest={attestSteady}
+                holdTime={NFT_COLLECTIONS['steady'].holdTime}
+              />
+
               {/* filler div to remove the "hole" between the two smol joe cards */}
-              <div className="sm:w-[205px] md:w-[245px] lg:w-[330px]">
-              </div>
+              {/* <div className="sm:w-[205px] md:w-[245px] lg:w-[330px]"></div> */}
             </>
           )}
 
