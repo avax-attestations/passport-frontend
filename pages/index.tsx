@@ -8,7 +8,7 @@ import { AttestCardReferral } from "@/components/attest-card-referral"
 import { AttestCardVolume } from "@/components/attest-card-volume"
 import { Header } from "@/components/header"
 import { ConnectHeader } from "@/components/connect-header"
-
+import { isYieldYakAirdrop } from "@/lib/yield-yak"
 import { isDiamondHands } from "@/lib/diamond-hands"
 import { useAttest } from "@/hooks/useAttest";
 import { useDiamondBalance } from "@/hooks/useDiamondBalance";
@@ -38,7 +38,9 @@ function Main({ session, csrfToken }: SignedInProps) {
   const walletAddress = session?.user?.sub
 
   const diamondHands = isDiamondHands(walletAddress)
+  const yieldYakAirdrop = isYieldYakAirdrop(walletAddress)
   const { attest: attestDiamondHands, isAttested: isAttestedDiamondHands } = useAttest('diamond-hand', walletAddress)
+  const { attest: attestYieldYakAirdrop, isAttested: isAttestedYieldYakAirdrop} = useAttest('yield-yak-airdrop', walletAddress)
   const { attest: attestTwitter, isAttested: isAttestedTwitter } = useAttest('twitter', walletAddress)
   const { attest: attestVolume } = useAttest('volume', walletAddress)
   const { attest: attestReferral, isAttested: isAttestedReferral } = useAttest('referral', walletAddress)
@@ -164,11 +166,20 @@ function Main({ session, csrfToken }: SignedInProps) {
                 holdTime={NFT_COLLECTIONS['steady'].holdTime}
               />
 
+              <AttestCard name="yield-yak-airdrop">
+                {yieldYakAirdrop ? (
+                  <><p>You have YieldYak Airdrop!</p>
+                    {isAttestedYieldYakAirdrop ? <p>Already attested</p> :
+                      <Button variant="passport" type="button" onClick={attestYieldYakAirdrop}>Attest</Button>}</>
+                ) : (
+                  <p>You do not have the YieldYak airdrop</p>)}
+              </AttestCard>
+
+
               {/* filler div to remove the "hole" between the two smol joe cards */}
               {/* <div className="sm:w-[205px] md:w-[245px] lg:w-[330px]"></div> */}
             </>
           )}
-
           <AttestCardReferral
             hasReferral={hasReferral}
             isAttested={isAttestedReferral}

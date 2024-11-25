@@ -90,7 +90,12 @@ export const ATTESTATION_CONFIG: AttestationConfig = {
     'steady': {
         schemaUID: process.env.NEXT_PUBLIC_NFT_HOLDER_SCHEMA! as string,
         encoder: new SchemaEncoder('address collection')
-    }
+    },
+    'yield-yak-airdrop': {
+        schemaUID: process.env.NEXT_PUBLIC_YIELD_YAK_AIRDROP_SCHEMA! as string,
+        encoder: new SchemaEncoder('bool hasYieldYakAirdrop'),
+    },
+
 };
 
 export const EAS_ADDRESS = process.env.NEXT_PUBLIC_EAS_ADDRESS! as Address;
