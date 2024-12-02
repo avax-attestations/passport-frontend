@@ -18,7 +18,7 @@ export const chains = (() => {
     return devChains
   }
 
-  if (process.env.PROD_CHAIN) {
+  if (process.env.NEXT_PUBLIC_PROD_CHAIN) {
     return prodChains
   }
 
