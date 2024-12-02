@@ -96,90 +96,86 @@ function Main({ session, csrfToken }: SignedInProps) {
 
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between items-center">
 
-          {isAttestedReferral && (
-            <>
-              {socialConnections.map((props) => (
-                <AttestCardSocialConnection key={props.name} {...props} csrfToken={csrfToken} />
-              ))}
+          {socialConnections.map((props) => (
+            <AttestCardSocialConnection key={props.name} {...props} csrfToken={csrfToken} />
+          ))}
 
-              <AttestCard name="diamond-hand">
-                {diamondHands ? (
-                  <><p>You have diamond hands!</p>
-                    {isAttestedDiamondHands ? <p>Already attested</p> :
-                      <Button variant="passport" type="button" onClick={attestDiamondHands}>Attest</Button>}</>
-                ) : (
-                  <p>You do not have diamond hands</p>)}
-              </AttestCard>
+          <AttestCard name="diamond-hand">
+            {diamondHands ? (
+              <><p>You have diamond hands!</p>
+                {isAttestedDiamondHands ? <p>Already attested</p> :
+                  <Button variant="passport" type="button" onClick={attestDiamondHands}>Attest</Button>}</>
+            ) : (
+              <p>You do not have diamond hands</p>)}
+          </AttestCard>
 
-              <AttestCardVolume
-                name="volume"
-                volume={volume}
-                attestedVolume={attestedVolume}
-                attestVolume={attestVolume} />
+          <AttestCardVolume
+            name="volume"
+            volume={volume}
+            attestedVolume={attestedVolume}
+            attestVolume={attestVolume} />
 
-              <AttestCardNFTCollection
-                name='smol-joes'
-                description='smol joes nft collection'
-                hasValidItem={hasSmolJoeForTime}
-                isAttested={isAttestedSmolJoe}
-                attest={attestSmolJoe}
-                holdTime={NFT_COLLECTIONS['smol-joes'].holdTime}
-              />
-              <AttestCardNFTCollection
-                name='og-smol-joes'
-                description='OG smol joes nft collection'
-                hasValidItem={hasOGSmolJoeForTime}
-                isAttested={isAttestedOGSmolJoe}
-                attest={attestOGSmolJoe}
-                holdTime={NFT_COLLECTIONS['og-smol-joes'].holdTime}
-              />
-              <AttestCardNFTCollection
-                name='nochillio'
-                description='nochillio nft collection'
-                hasValidItem={hasNochillioForTime}
-                isAttested={isAttestedNochillio}
-                attest={attestNochillio}
-                holdTime={NFT_COLLECTIONS['nochillio'].holdTime}
-              />
-              <AttestCardNFTCollection
-                name='bruskies'
-                description='bruskies nft collection'
-                hasValidItem={hasBruskiesForTime}
-                isAttested={isAttestedBruskies}
-                attest={attestBruskies}
-                holdTime={NFT_COLLECTIONS['bruskies'].holdTime}
-              />
-              <AttestCardNFTCollection
-                name='peons'
-                description='peons nft collection'
-                hasValidItem={hasPeonsForTime}
-                isAttested={isAttestedPeons}
-                attest={attestPeons}
-                holdTime={NFT_COLLECTIONS['peons'].holdTime}
-              />
-            <AttestCardNFTCollection
-                name='steady'
-                description='steady nft collection'
-                hasValidItem={hasSteadyForTime}
-                isAttested={isAttestedSteady}
-                attest={attestSteady}
-                holdTime={NFT_COLLECTIONS['steady'].holdTime}
-              />
+          <AttestCardNFTCollection
+            name='smol-joes'
+            description='smol joes nft collection'
+            hasValidItem={hasSmolJoeForTime}
+            isAttested={isAttestedSmolJoe}
+            attest={attestSmolJoe}
+            holdTime={NFT_COLLECTIONS['smol-joes'].holdTime}
+          />
+          <AttestCardNFTCollection
+            name='og-smol-joes'
+            description='OG smol joes nft collection'
+            hasValidItem={hasOGSmolJoeForTime}
+            isAttested={isAttestedOGSmolJoe}
+            attest={attestOGSmolJoe}
+            holdTime={NFT_COLLECTIONS['og-smol-joes'].holdTime}
+          />
+          <AttestCardNFTCollection
+            name='nochillio'
+            description='nochillio nft collection'
+            hasValidItem={hasNochillioForTime}
+            isAttested={isAttestedNochillio}
+            attest={attestNochillio}
+            holdTime={NFT_COLLECTIONS['nochillio'].holdTime}
+          />
+          <AttestCardNFTCollection
+            name='bruskies'
+            description='bruskies nft collection'
+            hasValidItem={hasBruskiesForTime}
+            isAttested={isAttestedBruskies}
+            attest={attestBruskies}
+            holdTime={NFT_COLLECTIONS['bruskies'].holdTime}
+          />
+          <AttestCardNFTCollection
+            name='peons'
+            description='peons nft collection'
+            hasValidItem={hasPeonsForTime}
+            isAttested={isAttestedPeons}
+            attest={attestPeons}
+            holdTime={NFT_COLLECTIONS['peons'].holdTime}
+          />
+        <AttestCardNFTCollection
+            name='steady'
+            description='steady nft collection'
+            hasValidItem={hasSteadyForTime}
+            isAttested={isAttestedSteady}
+            attest={attestSteady}
+            holdTime={NFT_COLLECTIONS['steady'].holdTime}
+          />
 
-              <AttestCard name="yield-yak-airdrop">
-                {yieldYakAirdrop ? (
-                  <><p>You have YieldYak Airdrop!</p>
-                    {isAttestedYieldYakAirdrop ? <p>Already attested</p> :
-                      <Button variant="passport" type="button" onClick={attestYieldYakAirdrop}>Attest</Button>}</>
-                ) : (
-                  <p>You do not have the YieldYak airdrop</p>)}
-              </AttestCard>
+          <AttestCard name="yield-yak-airdrop">
+            {yieldYakAirdrop ? (
+              <><p>You have YieldYak Airdrop!</p>
+                {isAttestedYieldYakAirdrop ? <p>Already attested</p> :
+                  <Button variant="passport" type="button" onClick={attestYieldYakAirdrop}>Attest</Button>}</>
+            ) : (
+              <p>You do not have the YieldYak airdrop</p>)}
+          </AttestCard>
 
+          {/* filler div to remove the "hole" between the two smol joe cards */}
+          {/* <div className="sm:w-[205px] md:w-[245px] lg:w-[330px]"></div> */}
 
-              {/* filler div to remove the "hole" between the two smol joe cards */}
-              {/* <div className="sm:w-[205px] md:w-[245px] lg:w-[330px]"></div> */}
-            </>
-          )}
           <AttestCardReferral
             hasReferral={hasReferral}
             isAttested={isAttestedReferral}
