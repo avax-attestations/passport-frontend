@@ -159,11 +159,8 @@ export const AttestCardReferral: FC<AttestCardReferralProps> = ({
 
   return (
     <Card walletAddress={walletAddress}>
-      {isAttested ? (
-        <>
-          <GenerateReferrals walletAddress={walletAddress} />
-        </>
-      ) : (
+      <GenerateReferrals walletAddress={walletAddress} />
+      {
         hasReferral ? (
           <>
             <p>You have a referral code!</p>
@@ -181,7 +178,7 @@ export const AttestCardReferral: FC<AttestCardReferralProps> = ({
         ) : (
           <p>You do not have a referral code</p>
         )
-      )}
+      }
     </Card>
   )
 }
