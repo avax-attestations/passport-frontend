@@ -38,14 +38,14 @@ interface Item {
 
 // Get all the tokens for a given owner in a collection.
 export async function fetchCollectionItems(address: Address, collection: Address) : Promise<Array<Item>> {
-  const url = `https://api.joepegs.dev/v3/users/${address}/items?collectionAddresses=${collection}`;
+  const url = `https://api-internal.joepegs.dev/v3/users/${address}/items?collectionAddresses=${collection}`;
   return await fetchJSON(url);
 }
 
 
 // Get all the transfer events for a given item.
 export async function fetchItemActivities(collection: Address, tokenId: string) : Promise<Array<Activity>> {
-  const url = `https://api.joepegs.dev/v3/activities/avalanche/${collection}/tokens/${tokenId}?filters=transfer&filters=mint`
+  const url = `https://api-internal.joepegs.dev/v3/activities/avalanche/${collection}/tokens/${tokenId}?filters=transfer&filters=mint`
   return await fetchJSON(url);
 }
 // Returns true if a user has held any token in a given collection
