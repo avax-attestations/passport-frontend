@@ -200,11 +200,11 @@ export default function Home() {
           onSignIn={signIn}
           onSignOut={signOut} />
 
-        <Main
+        { session?.user?.sub && <Main
           csrfToken={csrfToken}
           session={session}
           signOut={signOut}
-        />
+        /> }
       </div>
       <Toaster />
     </main>
