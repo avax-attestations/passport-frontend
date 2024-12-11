@@ -9,6 +9,7 @@ import { AttestCardVolume } from "@/components/attest-card-volume"
 import { Header } from "@/components/header"
 import { ConnectHeader } from "@/components/connect-header"
 import { isYieldYakAirdrop } from "@/lib/yield-yak"
+import { isAvalancheAmbassador } from "@/lib/avalanche-ambassador";
 import { isDiamondHands } from "@/lib/diamond-hands"
 import { useAttest } from "@/hooks/useAttest";
 import { useDiamondBalance } from "@/hooks/useDiamondBalance";
@@ -39,8 +40,10 @@ function Main({ session, csrfToken }: SignedInProps) {
 
   const diamondHands = isDiamondHands(walletAddress)
   const yieldYakAirdrop = isYieldYakAirdrop(walletAddress)
+  const avalancheAmbassador = isAvalancheAmbassador(walletAddress);
   const { attest: attestDiamondHands, isAttested: isAttestedDiamondHands } = useAttest('diamond-hand', walletAddress)
   const { attest: attestYieldYakAirdrop, isAttested: isAttestedYieldYakAirdrop} = useAttest('yield-yak-airdrop', walletAddress)
+  const { attest: attestAvalancheAmbassador, isAttested: isAttestedAvalancheAmbassador} = useAttest('avalanche-ambassador', walletAddress)
   const { attest: attestTwitter, isAttested: isAttestedTwitter } = useAttest('twitter', walletAddress)
   const { attest: attestVolume } = useAttest('volume', walletAddress)
   const { attest: attestReferral, isAttested: isAttestedReferral } = useAttest('referral', walletAddress)
@@ -171,6 +174,15 @@ function Main({ session, csrfToken }: SignedInProps) {
                   <Button variant="passport" type="button" onClick={attestYieldYakAirdrop}>Attest</Button>}</>
             ) : (
               <p>You do not have the YieldYak airdrop</p>)}
+          </AttestCard>
+
+          <AttestCard name="avalanche-ambassador">
+            {avalancheAmbassador ? (
+              <><p>You have Avalanche Ambassador!</p>
+                {isAttestedAvalancheAmbassador ? <p>Already attested</p> :
+                  <Button variant="passport" type="button" onClick={attestAvalancheAmbassador}>Attest</Button>}</>
+            ) : (
+              <p>You do not have the Avalanche Ambassador</p>)}
           </AttestCard>
 
           {/* filler div to remove the "hole" between the two smol joe cards */}
