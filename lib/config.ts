@@ -95,6 +95,11 @@ export const ATTESTATION_CONFIG: AttestationConfig = {
         schemaUID: process.env.NEXT_PUBLIC_YIELD_YAK_AIRDROP_SCHEMA! as string,
         encoder: new SchemaEncoder('bool hasYieldYakAirdrop'),
     },
+    'avalanche-ambassador': {
+        schemaUID: process.env.NEXT_PUBLIC_AVALANCHE_AMBASSADOR_SCHEMA! as string,
+        encoder: new SchemaEncoder('bool isAvalancheAmbassador'),
+    },
+
 
 };
 
