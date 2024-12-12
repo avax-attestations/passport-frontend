@@ -186,8 +186,7 @@ function Main({ session, csrfToken }: SignedInProps) {
           </AttestCard>
 
           {/* filler div to remove the "hole" between the two smol joe cards */}
-          {/* <div className="sm:w-[205px] md:w-[245px] lg:w-[330px]"></div> */}
-
+          <div className="sm:w-[205px] md:w-[245px] lg:w-[330px]"></div>
           <AttestCardReferral
             hasReferral={hasReferral}
             isAttested={isAttestedReferral}
