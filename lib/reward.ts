@@ -60,6 +60,7 @@ export async function volumeRewardFor(
   client: PublicClient,
   volume: number
 ): Promise<string> {
+  if (volume < 0) return formatEther(BigInt(0));
   const rewarder = await getRewarderAddress('volume', client);
   const data = encodeAbiParameters([
     { name: 'volume', type: 'uint256'}
