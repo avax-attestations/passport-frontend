@@ -158,7 +158,7 @@ function Main({ session, csrfToken }: SignedInProps) {
             attest={attestPeons}
             holdTime={NFT_COLLECTIONS['peons'].holdTime}
           />
-        <AttestCardNFTCollection
+          <AttestCardNFTCollection
             name='steady'
             description='steady nft collection'
             hasValidItem={hasSteadyForTime}
